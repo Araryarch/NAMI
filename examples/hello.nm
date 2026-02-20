@@ -1,0 +1,33 @@
+// Hello World in NAMI
+let greeting = "Hello, World!";
+println(greeting);
+
+// Variables
+let x = 10;
+let y = 20;
+let sum = x + y;
+println(sum);
+
+// Function
+function add(a, b) {
+  return a + b;
+}
+
+let result = add(3, 4);
+println(result);
+
+// Control flow
+if (result > 5) {
+  println("Result is greater than 5");
+} else {
+  println("Result is 5 or less");
+}
+
+// Loop
+for (let i = 0; i < 5; i++) {
+  println(i);
+}
+
+// Array
+let arr = [1, 2, 3, 4, 5];
+println(arr);

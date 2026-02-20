@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Build output
+lib/
+dist/
+*.js.map
+*.d.ts.map
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+.temp/
+tmp/
+
+# Generated C code
+output/
+*.c
+*.h
+!runtime/*.c
+!runtime/*.h
+
+#plan
+.kiro/
+.kiro/*
