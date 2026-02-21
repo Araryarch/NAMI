@@ -109,6 +109,9 @@ export enum TokenType {
   COMMENT = 'COMMENT',
   BLOCK_COMMENT = 'BLOCK_COMMENT',
 
+  // Error recovery
+  ERROR = 'ERROR',
+
   // Special
   EOF = 'EOF',
 }

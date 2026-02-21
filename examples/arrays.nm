@@ -1,0 +1,93 @@
+// Arrays Example
+// This file demonstrates array operations in Nami
+
+// ===== ARRAY CREATION =====
+// Expected output: [1, 2, 3, 4, 5]
+let numbers = [1, 2, 3, 4, 5];
+println(numbers);
+
+// ===== EMPTY ARRAY =====
+// Expected output: []
+let empty = [];
+println(empty);
+
+// ===== ARRAY WITH DIFFERENT TYPES =====
+// Expected output: [1, hello, true]
+let mixed = [1, "hello", true];
+println(mixed);
+
+// ===== ARRAY INDEXING =====
+// Expected output: 1
+let first = numbers[0];
+println(first);
+
+// Expected output: 3
+let third = numbers[2];
+println(third);
+
+// Expected output: 5
+let last = numbers[4];
+println(last);
+
+// ===== ARRAY MODIFICATION =====
+// Expected output: [10, 2, 3, 4, 5]
+let modifiable = [1, 2, 3, 4, 5];
+modifiable[0] = 10;
+println(modifiable);
+
+// Expected output: [1, 2, 99, 4, 5]
+let another = [1, 2, 3, 4, 5];
+another[2] = 99;
+println(another);
+
+// ===== ARRAY LENGTH =====
+// Expected output: 5
+let arr = [10, 20, 30, 40, 50];
+let len = arr.length;
+println(len);
+
+// ===== ITERATING OVER ARRAY =====
+// Expected output: 10
+// Expected output: 20
+// Expected output: 30
+let items = [10, 20, 30];
+for (let i = 0; i < items.length; i++) {
+  println(items[i]);
+}
+
+// ===== ARRAY WITH STRINGS =====
+// Expected output: [apple, banana, cherry]
+let fruits = ["apple", "banana", "cherry"];
+println(fruits);
+
+// Expected output: banana
+println(fruits[1]);
+
+// ===== NESTED ARRAYS =====
+// Expected output: [[1, 2], [3, 4]]
+let matrix = [[1, 2], [3, 4]];
+println(matrix);
+
+// Expected output: [1, 2]
+println(matrix[0]);
+
+// Expected output: 2
+println(matrix[0][1]);
+
+// ===== ARRAY IN FUNCTION =====
+// Expected output: 15
+function sumArray(arr) {
+  let total = 0;
+  for (let i = 0; i < arr.length; i++) {
+    total = total + arr[i];
+  }
+  return total;
+}
+let sum = sumArray([1, 2, 3, 4, 5]);
+println(sum);
+
+// ===== ARRAY ASSIGNMENT =====
+// Expected output: [7, 8, 9]
+let original = [7, 8, 9];
+let copy = original;
+println(copy);

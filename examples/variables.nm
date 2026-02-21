@@ -1,0 +1,86 @@
+// Variables and Types Example
+// This file demonstrates variable declarations and basic types in Nami
+
+// ===== LET DECLARATIONS =====
+// Expected output: 42
+let x = 42;
+println(x);
+
+// Expected output: Hello, Nami
+let greeting = "Hello, Nami";
+println(greeting);
+
+// Expected output: true
+let isValid = true;
+println(isValid);
+
+// Expected output: null
+let empty = null;
+println(empty);
+
+// ===== CONST DECLARATIONS =====
+// Expected output: 3.14159
+const PI = 3.14159;
+println(PI);
+
+// Expected output: NAMI Language
+const LANGUAGE_NAME = "NAMI Language";
+println(LANGUAGE_NAME);
+
+// ===== VAR DECLARATIONS =====
+// Expected output: 100
+var count = 100;
+println(count);
+
+// ===== VARIABLE REASSIGNMENT =====
+// Expected output: 50
+let mutable = 10;
+mutable = 50;
+println(mutable);
+
+// Expected output: 200
+var changeable = 100;
+changeable = 200;
+println(changeable);
+
+// ===== NUMBERS =====
+// Expected output: 0
+let zero = 0;
+println(zero);
+
+// Expected output: -42
+let negative = -42;
+println(negative);
+
+// Expected output: 3.14
+let decimal = 3.14;
+println(decimal);
+
+// ===== STRINGS =====
+// Expected output: 
+let emptyString = "";
+println(emptyString);
+
+// Expected output: Single line
+let singleLine = "Single line";
+println(singleLine);
+
+// ===== BOOLEANS =====
+// Expected output: true
+let truthValue = true;
+println(truthValue);
+
+// Expected output: false
+let falseValue = false;
+println(falseValue);
+
+// ===== MULTIPLE VARIABLES =====
+// Expected output: 1
+// Expected output: 2
+// Expected output: 3
+let a = 1;
+let b = 2;
+let c = 3;
+println(a);
+println(b);
+println(c);

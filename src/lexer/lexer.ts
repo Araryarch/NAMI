@@ -356,6 +356,8 @@ export class Lexer {
 
   private string(quote: string): void {
     let value = '';
+    const startLine = this.line;
+    
     while (!this.isAtEnd() && this.peek() !== quote) {
       // Allow multi-line strings - track line numbers
       if (this.peek() === '\n') {
@@ -364,6 +366,7 @@ export class Lexer {
         value += this.advance();
         continue;
       }
+      
       if (this.peek() === '\\') {
         this.advance(); // consume backslash
         const escaped = this.advance();
@@ -411,6 +414,10 @@ export class Lexer {
                     this.current
                   )
                 );
+                // Error recovery: skip to end of line and continue
+                while (!this.isAtEnd() && this.peek() !== '\n') {
+                  this.advance();
+                }
                 return;
               }
               hex += this.advance();
@@ -429,8 +436,11 @@ export class Lexer {
 
     if (this.isAtEnd()) {
       this.errors.push(
-        new LexError('Unterminated string literal', this.startLine, this.startColumn, this.start)
+        new LexError('Unterminated string literal', startLine, this.startColumn, this.start)
       );
+      // Error recovery: add an ERROR token for the unterminated string
+      // This allows tokenization to continue from where we left off
+      this.addToken(TokenType.ERROR, value);
       return;
     }
 

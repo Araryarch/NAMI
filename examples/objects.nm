@@ -1,0 +1,95 @@
+// Objects Example
+// This file demonstrates object operations in Nami
+
+// ===== OBJECT CREATION =====
+// Expected output: {name: Alice, age: 30}
+let person = {
+  name: "Alice",
+  age: 30
+};
+println(person);
+
+// ===== EMPTY OBJECT =====
+// Expected output: {}
+let empty = {};
+println(empty);
+
+// ===== PROPERTY ACCESS =====
+// Expected output: Alice
+let name = person.name;
+println(name);
+
+// Expected output: 30
+let age = person.age;
+println(age);
+
+// ===== PROPERTY MODIFICATION =====
+// Expected output: {name: Bob, age: 30}
+let user = {
+  name: "Alice",
+  age: 30
+};
+user.name = "Bob";
+println(user);
+
+// Expected output: {name: Alice, age: 25}
+let another = {
+  name: "Alice",
+  age: 30
+};
+another.age = 25;
+println(another);
+
+// ===== OBJECT WITH DIFFERENT TYPES =====
+// Expected output: {id: 1, active: true, score: 95.5}
+let record = {
+  id: 1,
+  active: true,
+  score: 95.5
+};
+println(record);
+
+// ===== NESTED OBJECTS =====
+// Expected output: {name: Charlie, address: {city: New York, zip: 10001}}
+let employee = {
+  name: "Charlie",
+  address: {
+    city: "New York",
+    zip: 10001
+  }
+};
+println(employee);
+
+// Expected output: {city: New York, zip: 10001}
+println(employee.address);
+
+// Expected output: New York
+println(employee.address.city);
+
+// ===== OBJECT WITH ARRAY =====
+// Expected output: {name: David, scores: [85, 90, 95]}
+let student = {
+  name: "David",
+  scores: [85, 90, 95]
+};
+println(student);
+
+// Expected output: [85, 90, 95]
+println(student.scores);
+
+// Expected output: 90
+println(student.scores[1]);
+
+// ===== OBJECT IN FUNCTION =====
+// Expected output: Alice is 30 years old
+function describeUser(user) {
+  return user.name + " is " + user.age + " years old";
+}
+let description = describeUser({name: "Alice", age: 30});
+println(description);
+
+// ===== OBJECT ASSIGNMENT =====
+// Expected output: {x: 10, y: 20}
+let point = {x: 10, y: 20};
+let pointCopy = point;
+println(pointCopy);

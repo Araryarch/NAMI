@@ -1,0 +1,31 @@
+{
+  "lsp": {
+    "trace": "messages",
+    "maxDiagnosticsPerFile": 50,
+    "completionTriggerCharacters": [".", "(", "[", " "]
+  },
+  "formatting": {
+    "indentSize": 2,
+    "useTabs": false,
+    "maxLineLength": 120,
+    "insertFinalNewline": true,
+    "trimTrailingWhitespace": true
+  },
+  "diagnostics": {
+    "enableUnusedVariableWarnings": true,
+    "enableUnreachableCodeWarnings": true,
+    "maxDiagnosticsPerFile": 50,
+    "severityLevels": {
+      "unused-variable": "warning",
+      "unreachable-code": "information",
+      "syntax-error": "error",
+      "semantic-error": "error"
+    }
+  },
+  "cli": {
+    "defaultOptimizationLevel": 1,
+    "verboseOutput": false,
+    "debugOutput": false,
+    "outputDirectory": "./build"
+  }
+}

@@ -1,0 +1,175 @@
+// Operators Example
+// This file demonstrates various operators in Nami
+
+// ===== ARITHMETIC OPERATORS =====
+
+// Addition
+// Expected output: 15
+let sum = 10 + 5;
+println(sum);
+
+// Subtraction
+// Expected output: 5
+let diff = 10 - 5;
+println(diff);
+
+// Multiplication
+// Expected output: 50
+let product = 10 * 5;
+println(product);
+
+// Division
+// Expected output: 2
+let quotient = 10 / 5;
+println(quotient);
+
+// Modulo
+// Expected output: 1
+let remainder = 10 % 3;
+println(remainder);
+
+// Negative
+// Expected output: -10
+let negative = -10;
+println(negative);
+
+// ===== COMPARISON OPERATORS =====
+
+// Equal to
+// Expected output: true
+let isEqual = 10 == 10;
+println(isEqual);
+
+// Expected output: false
+let notEqual1 = 10 == 5;
+println(notEqual1);
+
+// Not equal to
+// Expected output: true
+let notEqual2 = 10 != 5;
+println(notEqual2);
+
+// Expected output: false
+let notEqual3 = 10 != 10;
+println(notEqual3);
+
+// Less than
+// Expected output: true
+let lessThan = 5 < 10;
+println(lessThan);
+
+// Expected output: false
+let notLessThan = 10 < 5;
+println(notLessThan);
+
+// Greater than
+// Expected output: true
+let greaterThan = 10 > 5;
+println(greaterThan);
+
+// Expected output: false
+let notGreaterThan = 5 > 10;
+println(notGreaterThan);
+
+// Less than or equal to
+// Expected output: true
+let lessOrEqual1 = 5 <= 10;
+println(lessOrEqual1);
+
+// Expected output: true
+let lessOrEqual2 = 10 <= 10;
+println(lessOrEqual2);
+
+// Expected output: false
+let notLessOrEqual = 10 <= 5;
+println(notLessOrEqual);
+
+// Greater than or equal to
+// Expected output: true
+let greaterOrEqual1 = 10 >= 5;
+println(greaterOrEqual1);
+
+// Expected output: true
+let greaterOrEqual2 = 10 >= 10;
+println(greaterOrEqual2);
+
+// Expected output: false
+let notGreaterOrEqual = 5 >= 10;
+println(notGreaterOrEqual);
+
+// ===== LOGICAL OPERATORS =====
+
+// Logical AND
+// Expected output: true
+let andTrue = true && true;
+println(andTrue);
+
+// Expected output: false
+let andFalse1 = true && false;
+println(andFalse1);
+
+// Expected output: false
+let andFalse2 = false && true;
+println(andFalse2);
+
+// Expected output: false
+let andFalse3 = false && false;
+println(andFalse3);
+
+// Logical OR
+// Expected output: true
+let orTrue1 = true || true;
+println(orTrue1);
+
+// Expected output: true
+let orTrue2 = true || false;
+println(orTrue2);
+
+// Expected output: true
+let orTrue3 = false || true;
+println(orTrue3);
+
+// Expected output: false
+let orFalse = false || false;
+println(orFalse);
+
+// Logical NOT
+// Expected output: false
+let notTrue = !true;
+println(notTrue);
+
+// Expected output: true
+let notFalse = !false;
+println(notFalse);
+
+// ===== COMPOUND EXPRESSIONS =====
+
+// Expected output: 35
+let compound1 = 10 + 5 * 5;
+println(compound1);
+
+// Expected output: 75
+let compound2 = (10 + 5) * 5;
+println(compound2);
+
+// Expected output: true
+let compound3 = 10 > 5 && 20 < 30;
+println(compound3);
+
+// Expected output: false
+let compound4 = 10 > 5 && 20 > 30;
+println(compound4);
+
+// Expected output: true
+let compound5 = 10 < 5 || 20 < 30;
+println(compound5);
+
+// ===== STRING CONCATENATION =====
+
+// Expected output: Hello World
+let concat1 = "Hello" + " " + "World";
+println(concat1);
+
+// Expected output: The answer is 42
+let concat2 = "The answer is " + 42;
+println(concat2);

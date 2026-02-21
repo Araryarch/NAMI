@@ -1,0 +1,106 @@
+// Functions Example
+// This file demonstrates function declarations and usage in Nami
+
+// ===== BASIC FUNCTION DECLARATION =====
+// Expected output: 7
+function add(a, b) {
+  return a + b;
+}
+let sum = add(3, 4);
+println(sum);
+
+// ===== FUNCTION WITH NO PARAMETERS =====
+// Expected output: Hello from function
+function greet() {
+  return "Hello from function";
+}
+let message = greet();
+println(message);
+
+// ===== FUNCTION WITH NO RETURN VALUE =====
+// Expected output: Printing from function
+function printMessage() {
+  println("Printing from function");
+}
+printMessage();
+
+// ===== FUNCTION WITH MULTIPLE PARAMETERS =====
+// Expected output: 60
+function multiply(x, y, z) {
+  return x * y * z;
+}
+let product = multiply(3, 4, 5);
+println(product);
+
+// ===== FUNCTION WITH STRING PARAMETERS =====
+// Expected output: Hello, Alice!
+function makeGreeting(name) {
+  return "Hello, " + name + "!";
+}
+let greeting = makeGreeting("Alice");
+println(greeting);
+
+// ===== NESTED FUNCTION CALLS =====
+// Expected output: 15
+function double(n) {
+  return n * 2;
+}
+function addFive(n) {
+  return n + 5;
+}
+let result = addFive(double(5));
+println(result);
+
+// ===== FUNCTION WITH CONDITIONAL LOGIC =====
+// Expected output: positive
+function checkSign(num) {
+  if (num > 0) {
+    return "positive";
+  } else if (num < 0) {
+    return "negative";
+  } else {
+    return "zero";
+  }
+}
+let sign = checkSign(42);
+println(sign);
+
+// ===== FUNCTION WITH LOOP =====
+// Expected output: 10
+function sumUpTo(n) {
+  let total = 0;
+  for (let i = 1; i <= n; i++) {
+    total = total + i;
+  }
+  return total;
+}
+let sumResult = sumUpTo(4);
+println(sumResult);
+
+// ===== RECURSIVE FUNCTION =====
+// Expected output: 120
+function factorial(n) {
+  if (n <= 1) {
+    return 1;
+  }
+  return n * factorial(n - 1);
+}
+let fact = factorial(5);
+println(fact);
+
+// ===== FUNCTION RETURNING BOOLEAN =====
+// Expected output: true
+function isEven(num) {
+  return num % 2 == 0;
+}
+let evenCheck = isEven(10);
+println(evenCheck);
+
+// ===== FUNCTION WITH LOCAL VARIABLES =====
+// Expected output: 25
+function calculateSquare(n) {
+  let square = n * n;
+  return square;
+}
+let squared = calculateSquare(5);
+println(squared);

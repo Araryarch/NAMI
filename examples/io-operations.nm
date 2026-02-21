@@ -1,0 +1,111 @@
+// I/O Operations Example
+// This file demonstrates input/output operations in Nami
+
+// ===== PRINTLN FUNCTION =====
+
+// Expected output: Hello, World!
+println("Hello, World!");
+
+// Expected output: 42
+println(42);
+
+// Expected output: true
+println(true);
+
+// Expected output: null
+println(null);
+
+// Expected output: [1, 2, 3]
+println([1, 2, 3]);
+
+// Expected output: {name: Alice, age: 30}
+println({name: "Alice", age: 30});
+
+// ===== PRINT FUNCTION (if supported) =====
+
+// Expected output: Hello (no newline)
+// Note: print() may not add a newline character
+// Uncomment if print() is supported:
+// print("Hello");
+// print(" ");
+// print("World");
+// println("!");
+
+// ===== STRING CONCATENATION WITH PRINTLN =====
+
+// Expected output: The sum is 15
+let a = 10;
+let b = 5;
+println("The sum is " + (a + b));
+
+// Expected output: Alice is 30 years old
+let name = "Alice";
+let age = 30;
+println(name + " is " + age + " years old");
+
+// ===== MULTIPLE PRINTLN CALLS =====
+
+// Expected output: Line 1
+// Expected output: Line 2
+// Expected output: Line 3
+println("Line 1");
+println("Line 2");
+println("Line 3");
+
+// ===== PRINTLN WITH EXPRESSIONS =====
+
+// Expected output: 100
+println(10 * 10);
+
+// Expected output: true
+println(5 < 10);
+
+// Expected output: false
+println(10 == 5);
+
+// ===== PRINTLN WITH VARIABLES =====
+
+// Expected output: 3.14159
+let pi = 3.14159;
+println(pi);
+
+// Expected output: NAMI Language
+let language = "NAMI Language";
+println(language);
+
+// ===== PRINTLN IN LOOPS =====
+
+// Expected output: 0
+// Expected output: 1
+// Expected output: 2
+// Expected output: 3
+// Expected output: 4
+for (let i = 0; i < 5; i++) {
+  println(i);
+}
+
+// ===== PRINTLN IN FUNCTIONS =====
+
+// Expected output: Function output
+function outputMessage() {
+  println("Function output");
+}
+outputMessage();
+
+// Expected output: Result: 42
+function printResult(value) {
+  println("Result: " + value);
+}
+printResult(42);
+
+// ===== EMPTY PRINTLN =====
+
+// Expected output: (empty line)
+println("");
+
+// ===== INPUT FUNCTION (if supported) =====
+// Note: input() requires interactive testing
+// Uncomment to test interactively:
+// println("Enter your name:");
+// let userName = input();
+// println("Hello, " + userName + "!");

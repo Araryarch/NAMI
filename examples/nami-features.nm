@@ -1,0 +1,119 @@
+// Nami-Specific Features Example
+// This file demonstrates features unique to the Nami language
+
+// Note: Some features may not be fully implemented yet
+// This file serves as a template and test for Nami-specific functionality
+
+// ===== RANGE EXPRESSIONS (if supported) =====
+// Expected output: 0
+// Expected output: 1
+// Expected output: 2
+// Expected output: 3
+// Expected output: 4
+// Uncomment when range is supported:
+// for (let i in range(0, 5)) {
+//   println(i);
+// }
+
+// ===== RANGE WITH STEP (if supported) =====
+// Expected output: 0
+// Expected output: 2
+// Expected output: 4
+// Expected output: 6
+// Expected output: 8
+// Uncomment when range with step is supported:
+// for (let i in range(0, 10, 2)) {
+//   println(i);
+// }
+
+// ===== IMPORT NM (if supported) =====
+// Expected output: (depends on imported module)
+// Uncomment when import nm is supported:
+// import nm "module_name";
+// // Use imported module functions
+
+// ===== IMPORT HTTP (if supported) =====
+// Expected output: (depends on HTTP response)
+// Uncomment when import http is supported:
+// import http "https://api.example.com/data";
+// // Use imported HTTP data
+
+// ===== LOOP STATEMENT (if supported) =====
+// Expected output: 0
+// Expected output: 1
+// Expected output: 2
+// Expected output: 3
+// Expected output: 4
+// Uncomment when loop statement is supported:
+// let counter = 0;
+// loop {
+//   if (counter >= 5) {
+//     break;
+//   }
+//   println(counter);
+//   counter = counter + 1;
+// }
+
+// ===== PRINT VS PRINTLN =====
+// Nami has both print() and println() functions
+// println() adds a newline, print() does not (if supported)
+
+// Expected output: Hello, World!
+println("Hello, World!");
+
+// Expected output: HelloWorld (if print is supported)
+// Uncomment when print is supported:
+// print("Hello");
+// print("World");
+// println("");
+
+// ===== STRING INTERPOLATION (if supported) =====
+// Expected output: The value is 42
+// Uncomment when string interpolation is supported:
+// let value = 42;
+// println(`The value is ${value}`);
+
+// ===== DESTRUCTURING (if supported) =====
+// Expected output: 1
+// Expected output: 2
+// Uncomment when destructuring is supported:
+// let [x, y] = [1, 2];
+// println(x);
+// println(y);
+
+// ===== SPREAD OPERATOR (if supported) =====
+// Expected output: [1, 2, 3, 4, 5]
+// Uncomment when spread operator is supported:
+// let arr1 = [1, 2, 3];
+// let arr2 = [4, 5];
+// let combined = [...arr1, ...arr2];
+// println(combined);
+
+// ===== ARROW FUNCTIONS (if supported) =====
+// Expected output: 15
+// Uncomment when arrow functions are supported:
+// let add = (a, b) => a + b;
+// let sum = add(10, 5);
+// println(sum);
+
+// ===== ASYNC FUNCTIONS (if supported) =====
+// Expected output: (depends on async implementation)
+// Uncomment when async functions are supported:
+// async function fetchData() {
+//   return "Data fetched";
+// }
+// 
+// let data = await fetchData();
+// println(data);
+
+// ===== PLACEHOLDER FOR CURRENT IMPLEMENTATION =====
+// Basic features that work now
+
+// Expected output: Nami supports basic features
+println("Nami supports basic features");
+
+// Expected output: Variables, functions, loops, arrays, objects
+println("Variables, functions, loops, arrays, objects");
+
+// Expected output: And more!
+println("And more!");

@@ -1,0 +1,113 @@
+// Error Handling Example
+// This file demonstrates error handling in Nami (if supported)
+
+// Note: Error handling features (try/catch/finally/throw) may not be fully implemented yet
+// This file serves as a template for when these features are available
+
+// ===== BASIC TRY-CATCH (if supported) =====
+// Expected output: Caught an error
+// Uncomment when try/catch is supported:
+// try {
+//   throw "An error occurred";
+// } catch (e) {
+//   println("Caught an error");
+// }
+
+// ===== TRY-CATCH WITH ERROR MESSAGE (if supported) =====
+// Expected output: Error: Something went wrong
+// Uncomment when try/catch is supported:
+// try {
+//   throw "Something went wrong";
+// } catch (error) {
+//   println("Error: " + error);
+// }
+
+// ===== TRY-CATCH-FINALLY (if supported) =====
+// Expected output: In try block
+// Expected output: In finally block
+// Uncomment when try/catch/finally is supported:
+// try {
+//   println("In try block");
+// } catch (e) {
+//   println("In catch block");
+// } finally {
+//   println("In finally block");
+// }
+
+// ===== ERROR IN FUNCTION (if supported) =====
+// Expected output: Error in function: Division by zero
+// Uncomment when try/catch is supported:
+// function divide(a, b) {
+//   if (b == 0) {
+//     throw "Division by zero";
+//   }
+//   return a / b;
+// }
+// 
+// try {
+//   let result = divide(10, 0);
+//   println(result);
+// } catch (error) {
+//   println("Error in function: " + error);
+// }
+
+// ===== NESTED TRY-CATCH (if supported) =====
+// Expected output: Outer catch
+// Uncomment when try/catch is supported:
+// try {
+//   try {
+//     throw "Inner error";
+//   } catch (inner) {
+//     throw "Outer error";
+//   }
+// } catch (outer) {
+//   println("Outer catch");
+// }
+
+// ===== CONDITIONAL ERROR HANDLING (if supported) =====
+// Expected output: Value is valid: 10
+// Uncomment when try/catch is supported:
+// function validateValue(value) {
+//   if (value < 0) {
+//     throw "Value must be positive";
+//   }
+//   return "Value is valid: " + value;
+// }
+// 
+// try {
+//   let message = validateValue(10);
+//   println(message);
+// } catch (error) {
+//   println("Validation error: " + error);
+// }
+
+// ===== PLACEHOLDER FOR CURRENT IMPLEMENTATION =====
+// Since error handling may not be implemented yet, here's a workaround using conditionals
+
+// Expected output: Error: Cannot divide by zero
+function safeDivide(a, b) {
+  if (b == 0) {
+    return "Error: Cannot divide by zero";
+  }
+  return a / b;
+}
+let result = safeDivide(10, 0);
+println(result);
+
+// Expected output: 5
+let validResult = safeDivide(10, 2);
+println(validResult);
+
+// Expected output: Error: Invalid input
+function validateInput(value) {
+  if (value < 0) {
+    return "Error: Invalid input";
+  }
+  return "Valid: " + value;
+}
+let validation = validateInput(-5);
+println(validation);
+
+// Expected output: Valid: 10
+let validValidation = validateInput(10);
+println(validValidation);
