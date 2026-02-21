@@ -1,0 +1,250 @@
+{
+  "Function Declaration": {
+    "prefix": "func",
+    "body": [
+      "function ${1:name}(${2:params}) {",
+      "\t${3:// body}",
+      "\treturn ${4:value};",
+      "}"
+    ],
+    "description": "Create a function"
+  },
+  "Arrow Function": {
+    "prefix": "arrow",
+    "body": [
+      "const ${1:name} = (${2:params}) => {",
+      "\t${3:// body}",
+      "\treturn ${4:value};",
+      "};"
+    ],
+    "description": "Create an arrow function"
+  },
+  "Arrow Function (concise)": {
+    "prefix": "arrowc",
+    "body": [
+      "const ${1:name} = (${2:params}) => ${3:expression};"
+    ],
+    "description": "Create a concise arrow function"
+  },
+  "If Statement": {
+    "prefix": "if",
+    "body": [
+      "if (${1:condition}) {",
+      "\t${2:// body}",
+      "}"
+    ],
+    "description": "Create an if statement"
+  },
+  "If-Else Statement": {
+    "prefix": "ifelse",
+    "body": [
+      "if (${1:condition}) {",
+      "\t${2:// if body}",
+      "} else {",
+      "\t${3:// else body}",
+      "}"
+    ],
+    "description": "Create an if-else statement"
+  },
+  "For Loop": {
+    "prefix": "for",
+    "body": [
+      "for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {",
+      "\t${3:// body}",
+      "}"
+    ],
+    "description": "Create a for loop"
+  },
+  "For-Of Loop": {
+    "prefix": "forof",
+    "body": [
+      "for (const ${1:item} of ${2:array}) {",
+      "\t${3:// body}",
+      "}"
+    ],
+    "description": "Create a for-of loop"
+  },
+  "While Loop": {
+    "prefix": "while",
+    "body": [
+      "while (${1:condition}) {",
+      "\t${2:// body}",
+      "}"
+    ],
+    "description": "Create a while loop"
+  },
+  "Do-While Loop": {
+    "prefix": "dowhile",
+    "body": [
+      "do {",
+      "\t${1:// body}",
+      "} while (${2:condition});"
+    ],
+    "description": "Create a do-while loop"
+  },
+  "Try-Catch": {
+    "prefix": "try",
+    "body": [
+      "try {",
+      "\t${1:// try body}",
+      "} catch (${2:error}) {",
+      "\t${3:// catch body}",
+      "}"
+    ],
+    "description": "Create a try-catch block"
+  },
+  "Try-Catch-Finally": {
+    "prefix": "tryf",
+    "body": [
+      "try {",
+      "\t${1:// try body}",
+      "} catch (${2:error}) {",
+      "\t${3:// catch body}",
+      "} finally {",
+      "\t${4:// finally body}",
+      "}"
+    ],
+    "description": "Create a try-catch-finally block"
+  },
+  "Switch Statement": {
+    "prefix": "switch",
+    "body": [
+      "switch (${1:expression}) {",
+      "\tcase ${2:value1}:",
+      "\t\t${3:// case 1}",
+      "\t\tbreak;",
+      "\tcase ${4:value2}:",
+      "\t\t${5:// case 2}",
+      "\t\tbreak;",
+      "\tdefault:",
+      "\t\t${6:// default}",
+      "}"
+    ],
+    "description": "Create a switch statement"
+  },
+  "Class Declaration": {
+    "prefix": "class",
+    "body": [
+      "class ${1:ClassName} {",
+      "\tconstructor(${2:params}) {",
+      "\t\t${3:// constructor body}",
+      "\t}",
+      "",
+      "\t${4:methodName}(${5:params}) {",
+      "\t\t${6:// method body}",
+      "\t}",
+      "}"
+    ],
+    "description": "Create a class"
+  },
+  "Console Log": {
+    "prefix": "log",
+    "body": [
+      "println(${1:value});"
+    ],
+    "description": "Print to console"
+  },
+  "Print": {
+    "prefix": "print",
+    "body": [
+      "print(${1:value});"
+    ],
+    "description": "Print without newline"
+  },
+  "Variable Declaration (let)": {
+    "prefix": "let",
+    "body": [
+      "let ${1:name} = ${2:value};"
+    ],
+    "description": "Declare a variable with let"
+  },
+  "Variable Declaration (const)": {
+    "prefix": "const",
+    "body": [
+      "const ${1:name} = ${2:value};"
+    ],
+    "description": "Declare a constant"
+  },
+  "Array Declaration": {
+    "prefix": "arr",
+    "body": [
+      "const ${1:array} = [${2:elements}];"
+    ],
+    "description": "Create an array"
+  },
+  "Object Declaration": {
+    "prefix": "obj",
+    "body": [
+      "const ${1:object} = {",
+      "\t${2:key}: ${3:value}",
+      "};"
+    ],
+    "description": "Create an object"
+  },
+  "Map Function": {
+    "prefix": "map",
+    "body": [
+      "${1:array}.map(${2:item} => ${3:expression})"
+    ],
+    "description": "Array map function"
+  },
+  "Filter Function": {
+    "prefix": "filter",
+    "body": [
+      "${1:array}.filter(${2:item} => ${3:condition})"
+    ],
+    "description": "Array filter function"
+  },
+  "Reduce Function": {
+    "prefix": "reduce",
+    "body": [
+      "${1:array}.reduce((${2:acc}, ${3:item}) => ${4:expression}, ${5:initial})"
+    ],
+    "description": "Array reduce function"
+  },
+  "Async Function": {
+    "prefix": "async",
+    "body": [
+      "async function ${1:name}(${2:params}) {",
+      "\t${3:// body}",
+      "\treturn ${4:value};",
+      "}"
+    ],
+    "description": "Create an async function"
+  },
+  "Await": {
+    "prefix": "await",
+    "body": [
+      "const ${1:result} = await ${2:promise};"
+    ],
+    "description": "Await a promise"
+  },
+  "Import": {
+    "prefix": "import",
+    "body": [
+      "import { ${1:exports} } from '${2:module}';"
+    ],
+    "description": "Import from module"
+  },
+  "Export": {
+    "prefix": "export",
+    "body": [
+      "export { ${1:exports} };"
+    ],
+    "description": "Export from module"
+  },
+  "NAMI Main": {
+    "prefix": "main",
+    "body": [
+      "// ${1:Program Name}",
+      "// ${2:Description}",
+      "",
+      "function main() {",
+      "\t${3:// Your code here}",
+      "}",
+      "",
+      "main();"
+    ],
+    "description": "Create a main function template"
+  }
+}

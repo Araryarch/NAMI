@@ -9,7 +9,26 @@ NAMI is a programming language designed for competitive programming and general-
 
 ## Project Status
 
-🚧 **Under Development** - Core infrastructure is being built.
+🚧 **Active Development** - Core features are working!
+
+### ✅ Working Features
+- Variables (let, const)
+- Functions with parameters and return values
+- Arrays with methods (map, filter, push, pop)
+- Control flow (if/else, for loops)
+- Operators (arithmetic, comparison, logical)
+- String literals and operations
+- Recursion and closures
+- CLI commands (run, build, compile, check)
+- Multi-platform executables (Linux, macOS, Windows)
+- VSCode extension with syntax highlighting
+
+### 📊 Test Results
+- Unit tests: Passing
+- Example tests: 6/13 passing (46%)
+- Feature coverage: Core features working
+
+See [TESTING.md](TESTING.md) for detailed testing information.
 
 ## Features (Planned)
 
@@ -71,6 +90,38 @@ npm run build:executable
 
 - **To install**: None! Standalone executable
 - **To use**: GCC or Clang (for compiling generated C code)
+
+## Editor Support
+
+### Visual Studio Code
+
+✅ **Extension Ready!** Install NAMI syntax highlighting:
+
+```bash
+# Build extension
+cd vscode-extension
+./build.sh
+
+# Install
+code --install-extension nami-language-0.1.0.vsix
+```
+
+**Features:**
+- ✅ Syntax highlighting for all NAMI features
+- ✅ 30+ code snippets (func, if, for, etc.)
+- ✅ Auto-closing brackets and quotes
+- ✅ Comment toggling (Ctrl+/)
+- ✅ Bracket matching
+- ✅ Code folding
+- ✅ NAMI Dark theme
+
+**Quick Test:**
+```bash
+echo 'function test() { println("Hello!"); }' > test.nm
+code test.nm
+```
+
+See [vscode-extension/INSTALL.md](vscode-extension/INSTALL.md) for details.
 
 ## Development
 

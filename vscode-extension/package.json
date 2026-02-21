@@ -1,0 +1,65 @@
+{
+  "name": "nami-language",
+  "displayName": "NAMI Language Support",
+  "description": "Syntax highlighting and language support for NAMI programming language",
+  "version": "0.1.0",
+  "publisher": "Araryarch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Araryarch/NAMI"
+  },
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "nami",
+    "syntax",
+    "highlighting",
+    "language"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "nami",
+        "aliases": [
+          "NAMI",
+          "nami"
+        ],
+        "extensions": [
+          ".nm"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "nami",
+        "scopeName": "source.nami",
+        "path": "./syntaxes/nami.tmLanguage.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "nami",
+        "path": "./snippets/nami.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "NAMI Dark",
+        "uiTheme": "vs-dark",
+        "path": "./themes/nami-dark.json"
+      }
+    ]
+  },
+  "scripts": {
+    "package": "vsce package",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^2.22.0"
+  }
+}

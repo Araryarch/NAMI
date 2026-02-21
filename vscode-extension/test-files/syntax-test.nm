@@ -1,0 +1,303 @@
+// NAMI Syntax Highlighting Test File
+// This file tests all syntax highlighting features
+
+// ===== COMMENTS =====
+// Single line comment
+/* Multi-line
+   comment */
+
+// ===== KEYWORDS =====
+// Control flow
+if (true) {
+    println("if");
+} else {
+    println("else");
+}
+
+switch (x) {
+    case 1:
+        break;
+    default:
+        break;
+}
+
+for (let i = 0; i < 10; i++) {
+    continue;
+}
+
+while (true) {
+    break;
+}
+
+do {
+    println("do-while");
+} while (false);
+
+// Storage
+let variable = 10;
+const constant = 20;
+var oldStyle = 30;
+
+function myFunction() {
+    return 42;
+}
+
+class MyClass {
+    constructor() {
+        this.value = 0;
+    }
+}
+
+// Async
+async function asyncFunc() {
+    await promise;
+}
+
+// ===== STRINGS =====
+let str1 = "double quotes";
+let str2 = 'single quotes';
+let str3 = `template literal ${variable}`;
+let str4 = "escape \n \t \\ \"";
+
+// ===== NUMBERS =====
+let decimal = 42;
+let float = 3.14159;
+let scientific = 1.5e10;
+let hex = 0xFF;
+let binary = 0b1010;
+let octal = 0o77;
+
+// ===== CONSTANTS =====
+let bool1 = true;
+let bool2 = false;
+let nothing = null;
+let undef = undefined;
+let notNumber = NaN;
+let inf = Infinity;
+
+// ===== OPERATORS =====
+// Arithmetic
+let add = a + b;
+let sub = a - b;
+let mul = a * b;
+let div = a / b;
+let mod = a % b;
+let pow = a ** b;
+let inc = ++a;
+let dec = --b;
+
+// Comparison
+let eq = a == b;
+let neq = a != b;
+let strict = a === b;
+let nstrict = a !== b;
+let lt = a < b;
+let gt = a > b;
+let lte = a <= b;
+let gte = a >= b;
+
+// Logical
+let and = a && b;
+let or = a || b;
+let not = !a;
+let nullish = a ?? b;
+
+// Bitwise
+let bitand = a & b;
+let bitor = a | b;
+let bitxor = a ^ b;
+let bitnot = ~a;
+let shl = a << b;
+let shr = a >> b;
+
+// Assignment
+let assign = a = b;
+let addAssign = a += b;
+let subAssign = a -= b;
+let mulAssign = a *= b;
+
+// Ternary
+let ternary = condition ? true : false;
+
+// Arrow
+let arrow = () => value;
+
+// Spread
+let spread = [...array];
+
+// Optional chaining
+let optional = obj?.property;
+
+// ===== FUNCTIONS =====
+// Built-in
+println("Hello");
+print("World");
+let input = input();
+let parsed = parseInt("42");
+let floated = parseFloat("3.14");
+
+// Math
+Math.abs(-5);
+Math.floor(3.7);
+Math.ceil(3.2);
+Math.round(3.5);
+Math.sqrt(16);
+Math.pow(2, 3);
+Math.random();
+Math.max(1, 2, 3);
+Math.min(1, 2, 3);
+
+// Array methods
+array.push(item);
+array.pop();
+array.map(x => x * 2);
+array.filter(x => x > 0);
+array.reduce((a, b) => a + b, 0);
+array.forEach(x => println(x));
+array.slice(0, 5);
+array.indexOf(item);
+array.includes(item);
+array.join(", ");
+
+// String methods
+str.charAt(0);
+str.substring(0, 5);
+str.split(",");
+str.replace("old", "new");
+str.toLowerCase();
+str.toUpperCase();
+str.trim();
+str.indexOf("sub");
+
+// ===== DECLARATIONS =====
+// Function
+function regularFunc(param1, param2) {
+    return param1 + param2;
+}
+
+// Arrow function
+const arrowFunc = (x, y) => x + y;
+const conciseArrow = x => x * 2;
+
+// Async function
+async function asyncFunction() {
+    const result = await promise;
+    return result;
+}
+
+// Class
+class Person {
+    constructor(name, age) {
+        this.name = name;
+        this.age = age;
+    }
+    
+    greet() {
+        println(`Hello, ${this.name}`);
+    }
+    
+    static create(name, age) {
+        return new Person(name, age);
+    }
+}
+
+// ===== DATA STRUCTURES =====
+// Array
+let array = [1, 2, 3, 4, 5];
+let nested = [[1, 2], [3, 4]];
+let mixed = [1, "two", true, null];
+
+// Object
+let object = {
+    key: "value",
+    number: 42,
+    nested: {
+        inner: "value"
+    },
+    method: function() {
+        return this.key;
+    }
+};
+
+// ===== CONTROL FLOW =====
+// If-else-if
+if (x > 0) {
+    println("positive");
+} else if (x < 0) {
+    println("negative");
+} else {
+    println("zero");
+}
+
+// Switch
+switch (value) {
+    case 1:
+        println("one");
+        break;
+    case 2:
+        println("two");
+        break;
+    default:
+        println("other");
+}
+
+// For loop
+for (let i = 0; i < 10; i++) {
+    println(i);
+}
+
+// For-of
+for (const item of array) {
+    println(item);
+}
+
+// For-in
+for (const key in object) {
+    println(key);
+}
+
+// While
+while (condition) {
+    println("loop");
+}
+
+// Do-while
+do {
+    println("loop");
+} while (condition);
+
+// ===== ERROR HANDLING =====
+try {
+    throw new Error("error");
+} catch (error) {
+    println(error);
+} finally {
+    println("cleanup");
+}
+
+// ===== MODULES =====
+import { func } from 'module';
+import * as mod from 'module';
+export { func };
+export default value;
+
+// ===== SPECIAL =====
+// This and super
+class Child extends Parent {
+    constructor() {
+        super();
+        this.value = 0;
+    }
+}
+
+// New
+let instance = new MyClass();
+
+// Typeof
+let type = typeof value;
+
+// Instanceof
+let isInstance = obj instanceof MyClass;
+
+// Delete
+delete obj.property;

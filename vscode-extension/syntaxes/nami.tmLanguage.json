@@ -1,0 +1,239 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "NAMI",
+  "scopeName": "source.nami",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#keywords" },
+    { "include": "#strings" },
+    { "include": "#numbers" },
+    { "include": "#functions" },
+    { "include": "#constants" },
+    { "include": "#operators" },
+    { "include": "#punctuation" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.nami",
+          "match": "//.*$"
+        },
+        {
+          "name": "comment.block.nami",
+          "begin": "/\\*",
+          "end": "\\*/"
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.nami",
+          "match": "\\b(if|else|switch|case|default|for|while|do|break|continue|return|try|catch|finally|throw)\\b"
+        },
+        {
+          "name": "keyword.control.loop.nami",
+          "match": "\\b(loop)\\b"
+        },
+        {
+          "name": "storage.type.nami",
+          "match": "\\b(let|const|var|function|class|interface|type|enum)\\b"
+        },
+        {
+          "name": "storage.modifier.nami",
+          "match": "\\b(async|await|static|public|private|protected|readonly)\\b"
+        },
+        {
+          "name": "keyword.operator.new.nami",
+          "match": "\\b(new|delete|typeof|instanceof)\\b"
+        },
+        {
+          "name": "keyword.other.nami",
+          "match": "\\b(this|super|extends|implements|export|import|from|as|in|of)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.nami",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.nami",
+              "match": "\\\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\\{[0-9A-Fa-f]+\\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.nami",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.nami",
+              "match": "\\\\(x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|u\\{[0-9A-Fa-f]+\\}|[0-2][0-7]{0,2}|3[0-6][0-7]?|37[0-7]?|[4-7][0-7]?|.|$)"
+            }
+          ]
+        },
+        {
+          "name": "string.template.nami",
+          "begin": "`",
+          "end": "`",
+          "patterns": [
+            {
+              "name": "constant.character.escape.nami",
+              "match": "\\\\."
+            },
+            {
+              "name": "meta.template.expression.nami",
+              "begin": "\\$\\{",
+              "end": "\\}",
+              "patterns": [
+                { "include": "$self" }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.nami",
+          "match": "\\b0[xX][0-9a-fA-F]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.nami",
+          "match": "\\b0[bB][01]+\\b"
+        },
+        {
+          "name": "constant.numeric.octal.nami",
+          "match": "\\b0[oO][0-7]+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.nami",
+          "match": "\\b([0-9]+\\.?[0-9]*|\\.[0-9]+)([eE][+-]?[0-9]+)?\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "name": "entity.name.function.nami",
+          "match": "\\b([a-zA-Z_$][a-zA-Z0-9_$]*)\\s*(?=\\()"
+        },
+        {
+          "name": "support.function.builtin.nami",
+          "match": "\\b(println|print|input|parseInt|parseFloat|isNaN|isFinite)\\b"
+        },
+        {
+          "name": "support.function.math.nami",
+          "match": "\\b(Math)\\.(abs|acos|asin|atan|atan2|ceil|cos|exp|floor|log|max|min|pow|random|round|sin|sqrt|tan)\\b"
+        },
+        {
+          "name": "support.function.array.nami",
+          "match": "\\.(push|pop|shift|unshift|slice|splice|concat|join|reverse|sort|indexOf|lastIndexOf|forEach|map|filter|reduce|reduceRight|every|some|find|findIndex|includes)\\b"
+        },
+        {
+          "name": "support.function.string.nami",
+          "match": "\\.(charAt|charCodeAt|concat|indexOf|lastIndexOf|match|replace|search|slice|split|substr|substring|toLowerCase|toUpperCase|trim|trimStart|trimEnd)\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "constant.language.boolean.nami",
+          "match": "\\b(true|false)\\b"
+        },
+        {
+          "name": "constant.language.null.nami",
+          "match": "\\b(null|undefined)\\b"
+        },
+        {
+          "name": "constant.language.nan.nami",
+          "match": "\\b(NaN|Infinity)\\b"
+        },
+        {
+          "name": "variable.language.this.nami",
+          "match": "\\b(this|super)\\b"
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arithmetic.nami",
+          "match": "\\+\\+|--|\\+|\\-|\\*\\*|\\*|/|%"
+        },
+        {
+          "name": "keyword.operator.comparison.nami",
+          "match": "===|!==|==|!=|<=|>=|<|>"
+        },
+        {
+          "name": "keyword.operator.logical.nami",
+          "match": "&&|\\|\\||!"
+        },
+        {
+          "name": "keyword.operator.bitwise.nami",
+          "match": "&|\\||\\^|~|<<|>>|>>>"
+        },
+        {
+          "name": "keyword.operator.assignment.nami",
+          "match": "=|\\+=|-=|\\*=|/=|%=|&=|\\|=|\\^=|<<=|>>=|>>>=|\\*\\*="
+        },
+        {
+          "name": "keyword.operator.ternary.nami",
+          "match": "\\?|:"
+        },
+        {
+          "name": "keyword.operator.arrow.nami",
+          "match": "=>"
+        },
+        {
+          "name": "keyword.operator.spread.nami",
+          "match": "\\.\\.\\."
+        },
+        {
+          "name": "keyword.operator.nullish.nami",
+          "match": "\\?\\?"
+        },
+        {
+          "name": "keyword.operator.optional.nami",
+          "match": "\\?\\."
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.statement.nami",
+          "match": ";"
+        },
+        {
+          "name": "punctuation.separator.comma.nami",
+          "match": ","
+        },
+        {
+          "name": "punctuation.accessor.nami",
+          "match": "\\."
+        },
+        {
+          "name": "meta.brace.round.nami",
+          "match": "\\(|\\)"
+        },
+        {
+          "name": "meta.brace.square.nami",
+          "match": "\\[|\\]"
+        },
+        {
+          "name": "meta.brace.curly.nami",
+          "match": "\\{|\\}"
+        }
+      ]
+    }
+  }
+}

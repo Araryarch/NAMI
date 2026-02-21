@@ -1,0 +1,17 @@
+# Build files
+node_modules/
+*.vsix
+bun.lock
+
+# Development files
+.vscode/
+.gitignore
+build.sh
+DEVELOPMENT.md
+SUMMARY.md
+
+# Test files
+test-files/
+
+# Documentation (keep README and CHANGELOG)
+# README.md and CHANGELOG.md are included by default
