@@ -1757,6 +1757,20 @@ static inline nami_value_t nami_get_prop(nami_value_t obj, const char* key) {
     return NAMI_NULL;
 }
 
+static inline void nami_set(nami_value_t obj, nami_value_t key, nami_value_t value) {
+    if (obj.type == NAMI_TYPE_ARRAY && key.type == NAMI_TYPE_INT) {
+        nami_array_set(obj.value.as_array, key.value.as_int, value);
+    } else if (obj.type == NAMI_TYPE_OBJECT && key.type == NAMI_TYPE_STRING) {
+        nami_object_set(obj.value.as_object, key.value.as_string->data, value);
+    }
+}
+
+static inline void nami_set_prop(nami_value_t obj, const char* key, nami_value_t value) {
+    if (obj.type == NAMI_TYPE_OBJECT) {
+        nami_object_set(obj.value.as_object, key, value);
+    }
+}
+
 // ── Sorting Algorithms ──────────────────────────────────
 
 /**
