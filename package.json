@@ -9,15 +9,20 @@
   },
   "scripts": {
     "build": "tsc",
+    "build:executable": "./build-executable.sh",
+    "build:all": "./build-executable.sh all",
     "watch": "tsc --watch",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
+    "test:examples": "./test-examples.sh",
+    "test:examples:generate": "./generate-expected.sh all",
+    "features": "./check-features.sh",
     "lint": "eslint src/**/*.ts tests/**/*.ts",
     "lint:fix": "eslint src/**/*.ts tests/**/*.ts --fix",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
-    "clean": "rm -rf lib"
+    "clean": "rm -rf lib dist"
   },
   "keywords": [
     "compiler",

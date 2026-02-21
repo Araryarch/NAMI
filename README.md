@@ -1,5 +1,10 @@
 # NAMI Programming Language
 
+[![Build Status](https://github.com/Araryarch/NAMI/workflows/Test/badge.svg)](https://github.com/Araryarch/NAMI/actions)
+[![Release](https://github.com/Araryarch/NAMI/workflows/Build%20and%20Release/badge.svg)](https://github.com/Araryarch/NAMI/releases)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Downloads](https://img.shields.io/github/downloads/Araryarch/NAMI/total)](https://github.com/Araryarch/NAMI/releases)
+
 NAMI is a programming language designed for competitive programming and general-purpose development. It features JavaScript-like syntax while compiling to efficient C code.
 
 ## Project Status
@@ -18,16 +23,54 @@ NAMI is a programming language designed for competitive programming and general-
 
 ## Installation
 
+### Quick Install (Recommended)
+
 ```bash
-# Install dependencies
-npm install
-
-# Build the compiler
-npm run build
-
-# Run tests
-npm test
+curl -fsSL https://raw.githubusercontent.com/Araryarch/NAMI/main/install.sh | bash
 ```
+
+### Download Binary
+
+Download the latest release for your platform:
+- [Linux x64](https://github.com/Araryarch/NAMI/releases/latest)
+- [macOS Intel](https://github.com/Araryarch/NAMI/releases/latest)
+- [macOS Apple Silicon](https://github.com/Araryarch/NAMI/releases/latest)
+- [Windows x64](https://github.com/Araryarch/NAMI/releases/latest)
+
+Extract and add to PATH:
+```bash
+# Linux / macOS
+tar -xzf nami-*.tar.gz
+sudo mv nami-* /usr/local/bin/nami
+
+# Test
+nami --version
+```
+
+### Build from Source
+
+```bash
+# Clone repository
+git clone https://github.com/Araryarch/NAMI.git
+cd NAMI
+
+# Install dependencies (requires Bun)
+bun install
+
+# Build compiler
+bun run build
+
+# Link CLI globally
+npm link
+
+# Or build standalone executable
+npm run build:executable
+```
+
+### Requirements
+
+- **To install**: None! Standalone executable
+- **To use**: GCC or Clang (for compiling generated C code)
 
 ## Development
 
@@ -42,17 +85,22 @@ nami-lang/
 ├── tests/            # Test files
 │   ├── unit/         # Unit tests
 │   └── property/     # Property-based tests
+├── examples/         # Example NAMI programs
+│   └── .expected/    # Expected test outputs
 ├── lib/              # Compiled JavaScript output
-└── runtime/          # C runtime library (future)
+└── runtime/          # C runtime library
+
 ```
 
 ### Available Scripts
 
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm run watch` - Watch mode for development
-- `npm test` - Run all tests
+- `npm test` - Run all unit tests
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Generate coverage report
+- `npm run test:examples` - Test all example programs
+- `npm run test:examples:generate` - Generate expected outputs
 - `npm run lint` - Check code style
 - `npm run lint:fix` - Fix code style issues
 - `npm run format` - Format code with Prettier
@@ -62,13 +110,19 @@ nami-lang/
 
 The project uses a dual testing approach:
 
-- **Unit Tests**: Specific examples and edge cases using Jest
-- **Property-Based Tests**: Universal properties using fast-check (minimum 100 iterations)
-
-Run tests:
+#### Unit Tests
+Specific examples and edge cases using Jest:
 ```bash
 npm test
 ```
+
+#### Example Tests
+End-to-end tests that run actual NAMI programs:
+```bash
+npm run test:examples
+```
+
+See [TESTING.md](TESTING.md) for detailed testing guide.
 
 ### Code Style
 

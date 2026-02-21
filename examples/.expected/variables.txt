@@ -1,0 +1,19 @@
+42
+Hello, Nami
+true
+null
+3.14159
+NAMI Language
+100
+50
+200
+0
+-42
+3.14
+
+Single line
+true
+false
+1
+2
+3

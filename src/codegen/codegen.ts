@@ -74,20 +74,19 @@ export class CodeGenerator {
       this.symbolTable &&
       program.body.some((s) => s.type === 'FunctionDeclaration' && s.id.name === 'main');
 
-    // Generate header
-    this.headerOutput.push('#ifndef NAMI_GENERATED_H');
-    this.headerOutput.push('#define NAMI_GENERATED_H');
-    this.headerOutput.push('');
-    this.headerOutput.push('#include "nami_runtime.h"');
-    this.headerOutput.push('');
-
-    // Generate source file header
-    this.emit('#include "nami_generated.h"');
+    // For single-file output, include runtime directly in source
+    this.emit('// NAMI Runtime - Inline');
     this.emit('#include <stdio.h>');
     this.emit('#include <stdlib.h>');
     this.emit('#include <string.h>');
     this.emit('#include <stdint.h>');
     this.emit('#include <stdbool.h>');
+    this.emit('#include <stdarg.h>');
+    this.emit('#include <math.h>');
+    this.emit('#include <setjmp.h>');
+    this.emit('');
+    this.emit('// Runtime will be included here by the build process');
+    this.emit('#include "nami_runtime.h"');
     this.emit('');
 
     // Optimization level defines
@@ -102,10 +101,15 @@ export class CodeGenerator {
     this.emit('static nami_loop_guard_t nami_loop_guard = {0, 1000000, true};');
     this.emit('');
 
-    // First pass: collect function declarations for headers
+    // First pass: collect function declarations (forward declarations)
+    this.emit('// Forward declarations');
     for (const stmt of program.body) {
       if (stmt.type === 'FunctionDeclaration') {
-        this.generateFunctionPrototype(stmt);
+        const name = this.sanitizeIdentifier(stmt.id.name);
+        const params = stmt.params
+          .map((p) => `nami_value_t ${this.sanitizeIdentifier(p.name)}`)
+          .join(', ');
+        this.emit(`nami_value_t ${name}(${params || 'void'});`);
       }
     }
 
@@ -152,7 +156,11 @@ export class CodeGenerator {
       }
     }
 
-    // Close header guard
+    // For backward compatibility, still generate header output
+    this.headerOutput.push('#ifndef NAMI_GENERATED_H');
+    this.headerOutput.push('#define NAMI_GENERATED_H');
+    this.headerOutput.push('');
+    this.headerOutput.push('#include "nami_runtime.h"');
     this.headerOutput.push('');
     this.headerOutput.push('#endif // NAMI_GENERATED_H');
 
@@ -255,13 +263,6 @@ export class CodeGenerator {
     }
   }
 
-  private generateFunctionPrototype(decl: FunctionDeclaration): void {
-    const name = this.sanitizeIdentifier(decl.id.name);
-    const params = decl.params
-      .map((p) => `nami_value_t ${this.sanitizeIdentifier(p.name)}`)
-      .join(', ');
-    this.headerOutput.push(`nami_value_t ${name}(${params || 'void'});`);
-  }
 
   private generateFunctionDeclaration(decl: FunctionDeclaration): void {
     const name = this.sanitizeIdentifier(decl.id.name);
@@ -962,22 +963,10 @@ export class CodeGenerator {
 
   // ── Helper Methods ─────────────────────────────────────
 
-  private inferCType(expr: Expression): string {
-    // Simple type inference for common cases
-    switch (expr.type) {
-      case 'NumericLiteral':
-        return Number.isInteger(expr.value) ? 'int64_t' : 'double';
-      case 'StringLiteral':
-        return 'nami_string_t*';
-      case 'BooleanLiteral':
-        return 'bool';
-      case 'ArrayExpression':
-        return 'nami_array_t*';
-      case 'ObjectExpression':
-        return 'nami_object_t*';
-      default:
-        return 'nami_value_t';
-    }
+  private inferCType(_expr: Expression): string {
+    // Always use nami_value_t for consistency
+    // The runtime handles type conversions internally
+    return 'nami_value_t';
   }
 
   private sanitizeIdentifier(name: string): string {

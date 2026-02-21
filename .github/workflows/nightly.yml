@@ -1,0 +1,93 @@
+name: Nightly Build
+
+on:
+  schedule:
+    # Run every day at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Nightly Build ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux-x64
+            artifact: nami-nightly-linux-x64
+          - os: macos-latest
+            platform: darwin-x64
+            artifact: nami-nightly-macos-x64
+          - os: macos-latest
+            platform: darwin-arm64
+            artifact: nami-nightly-macos-arm64
+          - os: windows-latest
+            platform: win-x64
+            artifact: nami-nightly-windows-x64.exe
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build TypeScript
+        run: bun run build
+
+      - name: Run tests
+        run: bun test
+
+      - name: Create standalone executable
+        run: |
+          bun build lib/cli.js --compile --outfile ${{ matrix.artifact }}
+        shell: bash
+
+      - name: Test executable (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ${{ matrix.artifact }}
+          ./${{ matrix.artifact }} --version
+
+      - name: Test executable (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          .\${{ matrix.artifact }} --version
+
+      - name: Create tarball (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          mkdir -p dist
+          tar -czf dist/${{ matrix.artifact }}.tar.gz ${{ matrix.artifact }} runtime/
+          
+      - name: Create zip (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          mkdir dist
+          Compress-Archive -Path ${{ matrix.artifact }},runtime -DestinationPath dist/${{ matrix.artifact }}.zip
+
+      - name: Upload to nightly release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: nightly
+          name: Nightly Build
+          files: dist/*
+          draft: false
+          prerelease: true
+          body: |
+            ## NAMI Nightly Build
+            
+            This is an automated nightly build from the latest commit.
+            
+            **Warning**: Nightly builds may be unstable. Use at your own risk.
+            
+            **Commit**: ${{ github.sha }}
+            **Date**: ${{ github.event.head_commit.timestamp }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

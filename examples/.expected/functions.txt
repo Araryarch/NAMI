@@ -1,0 +1,11 @@
+7
+Hello from function
+Printing from function
+60
+Hello, Alice!
+15
+positive
+10
+120
+true
+25

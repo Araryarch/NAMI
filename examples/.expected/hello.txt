@@ -1,0 +1,10 @@
+Hello, World!
+30
+7
+Result is greater than 5
+0
+1
+2
+3
+4
+[Array]

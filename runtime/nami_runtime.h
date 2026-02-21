@@ -85,15 +85,6 @@ static inline nami_value_t nami_value_bool(bool v) {
     return val;
 }
 
-static inline nami_value_t nami_value_string(const char* s) {
-    nami_value_t val;
-    val.type = NAMI_TYPE_STRING;
-    nami_string_t* str = (nami_string_t*)malloc(sizeof(nami_string_t) + strlen(s) + 1);
-    // String implementation details below
-    val.value.as_string = str;
-    return val;
-}
-
 // ── String Type ─────────────────────────────────────────
 
 struct nami_string {
@@ -102,6 +93,18 @@ struct nami_string {
     char data[];
 };
 
+// ── Array Type ──────────────────────────────────────────
+
+struct nami_array {
+    nami_value_t* items;
+    int64_t length;
+    int64_t capacity;
+};
+
+// ── String Functions ────────────────────────────────────
+
+static inline nami_value_t nami_value_string(const char* s);  // Forward declaration
+
 static inline nami_string_t* nami_string_create(const char* s) {
     size_t len = strlen(s);
     nami_string_t* str = (nami_string_t*)malloc(sizeof(nami_string_t) + len + 1);
@@ -109,6 +112,13 @@ static inline nami_string_t* nami_string_create(const char* s) {
     str->capacity = len + 1;
     memcpy(str->data, s, len + 1);
     return str;
+}
+
+static inline nami_value_t nami_value_string(const char* s) {
+    nami_value_t val;
+    val.type = NAMI_TYPE_STRING;
+    val.value.as_string = nami_string_create(s);
+    return val;
 }
 
 static inline nami_string_t* nami_string_concat(nami_string_t* a, nami_string_t* b) {
@@ -160,6 +170,10 @@ static inline void nami_string_destroy(nami_string_t* str) {
         free(str);
     }
 }
+
+// Forward declarations for array functions
+static inline nami_array_t* nami_array_create(void);
+static inline void nami_array_push(nami_array_t* arr, nami_value_t value);
 
 static inline nami_array_t* nami_string_split(nami_string_t* str, nami_string_t* delimiter) {
     nami_array_t* result = nami_array_create();
@@ -271,13 +285,7 @@ static inline nami_string_t* nami_string_join(nami_array_t* arr, nami_string_t* 
     return result;
 }
 
-// ── Array Type ──────────────────────────────────────────
-
-struct nami_array {
-    nami_value_t* items;
-    int64_t length;
-    int64_t capacity;
-};
+// ── Array Functions ─────────────────────────────────────
 
 static inline nami_array_t* nami_array_create(void) {
     nami_array_t* arr = (nami_array_t*)malloc(sizeof(nami_array_t));
@@ -1360,10 +1368,6 @@ static inline nami_array_t* nami_graph_astar(nami_graph_t* graph, int64_t start,
     return nami_array_create();
 }
 
-#endif // NAMI_RUNTIME_Hne nami_value_t nami_input_line(void) {
-    return nami_input();
-}
-
 // ── Type Query ──────────────────────────────────────────
 
 static inline nami_value_t nami_typeof(nami_value_t v) {
@@ -1665,43 +1669,6 @@ static inline nami_value_t nami_parse_float(nami_value_t v) {
     if (v.type == NAMI_TYPE_INT) return nami_value_float((double)v.value.as_int);
     if (v.type == NAMI_TYPE_STRING) return nami_value_float(atof(v.value.as_string->data));
     return nami_value_float(0.0);
-}
-
-// ── Async Support ───────────────────────────────────────
-
-typedef enum {
-    NAMI_ASYNC_PENDING,
-    NAMI_ASYNC_RESOLVED,
-    NAMI_ASYNC_REJECTED
-} nami_async_state_t;
-
-typedef struct {
-    nami_async_state_t state;
-    nami_value_t result;
-    void (*continuation)(void*);
-    void* context;
-} nami_promise_t;
-
-static inline nami_promise_t* nami_async_create(void) {
-    nami_promise_t* p = (nami_promise_t*)malloc(sizeof(nami_promise_t));
-    p->state = NAMI_ASYNC_PENDING;
-    p->result = NAMI_NULL;
-    p->continuation = NULL;
-    p->context = NULL;
-    return p;
-}
-
-static inline void nami_async_resolve(nami_promise_t* p, nami_value_t value) {
-    p->state = NAMI_ASYNC_RESOLVED;
-    p->result = value;
-    if (p->continuation) {
-        p->continuation(p->context);
-    }
-}
-
-static inline nami_value_t nami_async_await(nami_value_t v) {
-    // Simplified: just return the value
-    return v;
 }
 
 // ── Math Functions ──────────────────────────────────────
