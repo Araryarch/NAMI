@@ -13,10 +13,6 @@ import {
   typeToString,
   type NamiType,
   type PrimitiveType,
-  type ArrayType,
-  type FunctionType,
-  type ObjectType,
-  type PointerType,
 } from '../../src/types';
 
 describe('Type System - Type Constructors', () => {
@@ -384,7 +380,7 @@ describe('Type System - Runtime Type Tags (Requirement 12.3)', () => {
     // We verify the TypeScript type system aligns with it
     const primitiveTypes = ['int', 'float', 'string', 'bool', 'null'];
     primitiveTypes.forEach((typeName) => {
-      const type = Types[typeName as keyof typeof Types]() as PrimitiveType;
+      const type = (Types as any)[typeName]() as PrimitiveType;
       expect(type.kind).toBe('primitive');
       expect(type.name).toBe(typeName);
     });

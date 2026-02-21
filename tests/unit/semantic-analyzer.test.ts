@@ -5,7 +5,6 @@
 
 import { Parser } from '../../src/parser/parser';
 import { SemanticAnalyzer } from '../../src/analyzer/semantic';
-import { Types } from '../../src/types/types';
 
 describe('Semantic Analyzer - Symbol Table', () => {
   it('should define and resolve variables', () => {

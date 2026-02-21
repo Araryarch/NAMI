@@ -4,9 +4,7 @@
  */
 
 import { Parser } from '../../src/parser/parser';
-import { Lexer } from '../../src/lexer/lexer';
 import {
-  Program,
   VariableDeclaration,
   FunctionDeclaration,
   IfStatement,
@@ -362,7 +360,7 @@ describe('Parser', () => {
   describe('Error handling', () => {
     it('should collect errors without throwing', () => {
       const parser = new Parser('let x = ;'); // Invalid syntax
-      const ast = parser.parse();
+      parser.parse();
       expect(parser.getErrors().length).toBeGreaterThan(0);
     });
 
@@ -438,7 +436,7 @@ describe('Parser', () => {
     it('should provide descriptive error messages with line and column numbers', () => {
       const source = `let x = ;`;
       const parser = new Parser(source);
-      const ast = parser.parse();
+      parser.parse();
       const errors = parser.getErrors();
       
       expect(errors.length).toBeGreaterThan(0);

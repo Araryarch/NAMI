@@ -1,233 +1,373 @@
 /**
- * Module System Integration Tests
- * Requirements: 16.1, 16.2
- * 
- * Tests the complete flow of parsing import and export statements
+ * Integration tests for NAMI module system
+ * Tests module resolution, circular dependency detection, and code generation
  */
 
-import { Parser } from '../../src/parser/parser';
-import { Lexer } from '../../src/lexer/lexer';
-import { ImportStatement, ExportStatement, NamiImportStatement } from '../../src/parser/ast';
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
+import {
+  buildDependencyGraph,
+  checkCircularDependencies,
+  detectCircularDependencies,
+  getTopologicalOrder,
+  ModuleResolutionError,
+  CircularDependencyError,
+} from '../../src/features/module-system';
+import { ModuleCompiler } from '../../src/compiler/module-compiler';
 
-describe('Module System Integration', () => {
-  describe('Import Statements', () => {
-    it('should tokenize and parse NAMI-style bare import', () => {
-      const source = 'import nm;';
-      const lexer = new Lexer(source);
-      const tokens = [];
-      while (lexer.has_more()) {
-        tokens.push(lexer.next_token());
-      }
-      
-      // Verify tokens
-      expect(tokens[0].type).toBe('IMPORT');
-      expect(tokens[1].type).toBe('IDENTIFIER');
-      expect(tokens[1].lexeme).toBe('nm');
-      
-      // Verify parsing
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as NamiImportStatement;
-      expect(stmt.type).toBe('NamiImportStatement');
-      expect(stmt.module.name).toBe('nm');
-      expect(parser.getErrors()).toEqual([]);
+describe('Module System', () => {
+  let tempDir: string;
+
+  beforeEach(() => {
+    // Create a temporary directory for test files
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'nami-test-'));
+  });
+
+  afterEach(() => {
+    // Clean up temporary directory
+    if (fs.existsSync(tempDir)) {
+      fs.rmSync(tempDir, { recursive: true, force: true });
+    }
+  });
+
+  describe('Module Resolution', () => {
+    test('should resolve simple module import', () => {
+      // Create test files
+      const mathFile = path.join(tempDir, 'math.nm');
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        mathFile,
+        `
+export function add(a, b) {
+  return a + b;
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./math.nm";
+
+let result = add(1, 2);
+print(result);
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(mainFile);
+
+      expect(graph.nodes.size).toBeGreaterThanOrEqual(1);
+      expect(graph.entryPoint).toBe(path.resolve(mainFile));
     });
 
-    it('should tokenize and parse named imports with from clause', () => {
-      const source = 'import { add, subtract } from "./math";';
-      const lexer = new Lexer(source);
-      const tokens = [];
-      while (lexer.has_more()) {
-        tokens.push(lexer.next_token());
-      }
+    test('should resolve nested module imports', () => {
+      // Create test files
+      const utilsFile = path.join(tempDir, 'utils.nm');
+      const mathFile = path.join(tempDir, 'math.nm');
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        utilsFile,
+        `
+export function helper() {
+  return 42;
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mathFile,
+        `
+import { helper } from "./utils.nm";
+
+export function add(a, b) {
+  return a + b + helper();
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./math.nm";
+
+let result = add(1, 2);
+print(result);
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(mainFile);
+
+      expect(graph.nodes.size).toBeGreaterThanOrEqual(2);
       
-      // Verify key tokens
-      expect(tokens[0].type).toBe('IMPORT');
-      expect(tokens[1].type).toBe('LEFT_BRACE');
-      expect(tokens.some(t => t.type === 'FROM')).toBe(true);
-      expect(tokens.some(t => t.type === 'STRING')).toBe(true);
-      
-      // Verify parsing
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ImportStatement;
-      expect(stmt.type).toBe('ImportStatement');
-      expect(stmt.specifiers.length).toBe(2);
-      expect(stmt.specifiers[0].imported.name).toBe('add');
-      expect(stmt.specifiers[1].imported.name).toBe('subtract');
-      expect(stmt.source.value).toBe('./math');
-      expect(parser.getErrors()).toEqual([]);
+      // Check that all modules are in the graph
+      const mainNode = graph.nodes.get(path.resolve(mainFile));
+      expect(mainNode).toBeDefined();
+      expect(mainNode?.imports.length).toBeGreaterThan(0);
     });
 
-    it('should parse imports with aliases', () => {
-      const source = 'import { longFunctionName as short } from "./utils";';
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ImportStatement;
-      
-      expect(stmt.type).toBe('ImportStatement');
-      expect(stmt.specifiers[0].imported.name).toBe('longFunctionName');
-      expect(stmt.specifiers[0].local.name).toBe('short');
-      expect(parser.getErrors()).toEqual([]);
+    test('should throw error for missing module', () => {
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./nonexistent.nm";
+
+let result = add(1, 2);
+      `.trim()
+      );
+
+      expect(() => {
+        buildDependencyGraph(mainFile);
+      }).toThrow(ModuleResolutionError);
     });
   });
 
-  describe('Export Statements', () => {
-    it('should tokenize and parse export function', () => {
-      const source = 'export function multiply(a, b) { return a * b; }';
-      const lexer = new Lexer(source);
-      const tokens = [];
-      while (lexer.has_more()) {
-        tokens.push(lexer.next_token());
-      }
-      
-      // Verify tokens
-      expect(tokens[0].type).toBe('EXPORT');
-      expect(tokens[1].type).toBe('FUNCTION');
-      
-      // Verify parsing
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ExportStatement;
-      expect(stmt.type).toBe('ExportStatement');
-      expect(stmt.declaration.type).toBe('FunctionDeclaration');
-      expect(stmt.default).toBe(false);
-      expect(parser.getErrors()).toEqual([]);
+  describe('Circular Dependency Detection', () => {
+    test('should detect simple circular dependency', () => {
+      // Create circular dependency: a.nm -> b.nm -> a.nm
+      const aFile = path.join(tempDir, 'a.nm');
+      const bFile = path.join(tempDir, 'b.nm');
+
+      fs.writeFileSync(
+        aFile,
+        `
+import { funcB } from "./b.nm";
+
+export function funcA() {
+  return funcB();
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        bFile,
+        `
+import { funcA } from "./a.nm";
+
+export function funcB() {
+  return funcA();
+}
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(aFile);
+      const cycles = detectCircularDependencies(graph);
+
+      expect(cycles.length).toBeGreaterThan(0);
     });
 
-    it('should parse export default', () => {
-      const source = 'export default function main() { return 0; }';
-      const lexer = new Lexer(source);
-      const tokens = [];
-      while (lexer.has_more()) {
-        tokens.push(lexer.next_token());
-      }
-      
-      // Verify tokens
-      expect(tokens[0].type).toBe('EXPORT');
-      expect(tokens[1].type).toBe('DEFAULT');
-      expect(tokens[2].type).toBe('FUNCTION');
-      
-      // Verify parsing
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ExportStatement;
-      expect(stmt.type).toBe('ExportStatement');
-      expect(stmt.default).toBe(true);
-      expect(parser.getErrors()).toEqual([]);
+    test('should throw error when checking circular dependencies', () => {
+      // Create circular dependency
+      const aFile = path.join(tempDir, 'a.nm');
+      const bFile = path.join(tempDir, 'b.nm');
+
+      fs.writeFileSync(
+        aFile,
+        `
+import { funcB } from "./b.nm";
+
+export function funcA() {
+  return funcB();
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        bFile,
+        `
+import { funcA } from "./a.nm";
+
+export function funcB() {
+  return funcA();
+}
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(aFile);
+
+      expect(() => {
+        checkCircularDependencies(graph);
+      }).toThrow(CircularDependencyError);
     });
 
-    it('should parse export variable declaration', () => {
-      const source = 'export const VERSION = "1.0.0";';
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ExportStatement;
-      
-      expect(stmt.type).toBe('ExportStatement');
-      expect(stmt.declaration.type).toBe('VariableDeclaration');
-      expect(parser.getErrors()).toEqual([]);
-    });
+    test('should not detect circular dependency in valid graph', () => {
+      const utilsFile = path.join(tempDir, 'utils.nm');
+      const mathFile = path.join(tempDir, 'math.nm');
+      const mainFile = path.join(tempDir, 'main.nm');
 
-    it('should parse export async function', () => {
-      const source = 'export async function fetchData() { return await getData(); }';
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      const stmt = ast.body[0] as ExportStatement;
-      
-      expect(stmt.type).toBe('ExportStatement');
-      expect(stmt.declaration.type).toBe('FunctionDeclaration');
-      expect((stmt.declaration as any).async).toBe(true);
-      expect(parser.getErrors()).toEqual([]);
-    });
-  });
+      fs.writeFileSync(
+        utilsFile,
+        `
+export function helper() {
+  return 42;
+}
+      `.trim()
+      );
 
-  describe('Complete Module Files', () => {
-    it('should parse a module with imports and exports', () => {
-      const source = `
-        import { helper } from "./helpers";
-        import { config } from "./config";
-        
-        export function processData(data) {
-          return helper(data, config);
-        }
-        
-        export const VERSION = "2.0.0";
-      `;
-      
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      
-      expect(ast.body.length).toBe(4);
-      expect(ast.body[0].type).toBe('ImportStatement');
-      expect(ast.body[1].type).toBe('ImportStatement');
-      expect(ast.body[2].type).toBe('ExportStatement');
-      expect(ast.body[3].type).toBe('ExportStatement');
-      expect(parser.getErrors()).toEqual([]);
-    });
+      fs.writeFileSync(
+        mathFile,
+        `
+import { helper } from "./utils.nm";
 
-    it('should parse NAMI built-in module imports', () => {
-      const source = `
-        import nm;
-        import http;
-        
-        export function main() {
-          const input = nm.input();
-          const server = http.create();
-          return 0;
-        }
-      `;
-      
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      
-      expect(ast.body.length).toBe(3);
-      expect(ast.body[0].type).toBe('NamiImportStatement');
-      expect(ast.body[1].type).toBe('NamiImportStatement');
-      expect(ast.body[2].type).toBe('ExportStatement');
-      expect(parser.getErrors()).toEqual([]);
-    });
+export function add(a, b) {
+  return a + b + helper();
+}
+      `.trim()
+      );
 
-    it('should parse mixed import styles', () => {
-      const source = `
-        import nm;
-        import { readFile, writeFile } from "./fs";
-        import { parse as parseJSON } from "./json";
-        
-        export async function loadConfig(path) {
-          const content = await readFile(path);
-          return parseJSON(content);
-        }
-      `;
-      
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      
-      expect(ast.body.length).toBe(4);
-      expect(ast.body[0].type).toBe('NamiImportStatement');
-      expect(ast.body[1].type).toBe('ImportStatement');
-      expect(ast.body[2].type).toBe('ImportStatement');
-      expect(ast.body[3].type).toBe('ExportStatement');
-      expect(parser.getErrors()).toEqual([]);
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./math.nm";
+
+let result = add(1, 2);
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(mainFile);
+
+      expect(() => {
+        checkCircularDependencies(graph);
+      }).not.toThrow();
     });
   });
 
-  describe('Error Cases', () => {
-    it('should handle import without from clause for named imports', () => {
-      const source = 'import { foo };'; // Missing 'from' clause
-      const parser = new Parser(source);
-      const ast = parser.parse();
+  describe('Topological Ordering', () => {
+    test('should return modules in dependency order', () => {
+      const utilsFile = path.join(tempDir, 'utils.nm');
+      const mathFile = path.join(tempDir, 'math.nm');
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        utilsFile,
+        `
+export function helper() {
+  return 42;
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mathFile,
+        `
+import { helper } from "./utils.nm";
+
+export function add(a, b) {
+  return a + b;
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./math.nm";
+
+let result = add(1, 2);
+      `.trim()
+      );
+
+      const graph = buildDependencyGraph(mainFile);
+      const order = getTopologicalOrder(graph);
+
+      expect(order.length).toBeGreaterThan(0);
       
-      // Should have errors
-      expect(parser.getErrors().length).toBeGreaterThan(0);
+      // Main file should be last (depends on others)
+      expect(order[order.length - 1]).toBe(path.resolve(mainFile));
+    });
+  });
+
+  describe('Module Compiler', () => {
+    test('should compile single module program', () => {
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        mainFile,
+        `
+function add(a, b) {
+  return a + b;
+}
+
+let result = add(1, 2);
+print(result);
+      `.trim()
+      );
+
+      const compiler = new ModuleCompiler({ optimization: 'debug' });
+      const result = compiler.compileProgram(mainFile);
+
+      expect(result.success).toBe(true);
+      expect(result.errors.length).toBe(0);
+      expect(result.modules.size).toBeGreaterThan(0);
     });
 
-    it('should handle export without declaration', () => {
-      const source = 'export;'; // Missing what to export
-      const parser = new Parser(source);
-      const ast = parser.parse();
-      
-      // Parser should handle this gracefully
-      expect(ast.body.length).toBeGreaterThanOrEqual(0);
+    test('should compile multi-module program', () => {
+      const mathFile = path.join(tempDir, 'math.nm');
+      const mainFile = path.join(tempDir, 'main.nm');
+
+      fs.writeFileSync(
+        mathFile,
+        `
+export function add(a, b) {
+  return a + b;
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        mainFile,
+        `
+import { add } from "./math.nm";
+
+let result = add(1, 2);
+print(result);
+      `.trim()
+      );
+
+      const compiler = new ModuleCompiler({ optimization: 'debug' });
+      const result = compiler.compileProgram(mainFile);
+
+      expect(result.success).toBe(true);
+      expect(result.errors.length).toBe(0);
+      expect(result.modules.size).toBeGreaterThanOrEqual(1);
+    });
+
+    test('should fail compilation with circular dependency', () => {
+      const aFile = path.join(tempDir, 'a.nm');
+      const bFile = path.join(tempDir, 'b.nm');
+
+      fs.writeFileSync(
+        aFile,
+        `
+import { funcB } from "./b.nm";
+
+export function funcA() {
+  return funcB();
+}
+      `.trim()
+      );
+
+      fs.writeFileSync(
+        bFile,
+        `
+import { funcA } from "./a.nm";
+
+export function funcB() {
+  return funcA();
+}
+      `.trim()
+      );
+
+      const compiler = new ModuleCompiler({ optimization: 'debug' });
+      const result = compiler.compileProgram(aFile);
+
+      expect(result.success).toBe(false);
+      expect(result.errors.length).toBeGreaterThan(0);
+      expect(result.errors[0].type).toBe('circular');
     });
   });
 });

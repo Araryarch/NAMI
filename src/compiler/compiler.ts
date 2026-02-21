@@ -7,9 +7,10 @@ import { Lexer } from '../lexer';
 import { Parser, Program } from '../parser';
 import { SemanticAnalyzer, SymbolTable } from '../analyzer';
 import { CodeGenerator, GeneratedCode } from '../codegen';
+import { Optimizer, OptimizationLevel } from '../optimizer';
 
 export interface CompilerOptions {
-  optimization: 'debug' | 'release' | 'max';
+  optimization: OptimizationLevel;
   loopGuard: boolean;
   loopThreshold: number;
 }
@@ -102,14 +103,21 @@ export class Compiler {
       return { success: false, ast, symbolTable, errors };
     }
 
-    // Step 4: Code Generation
+    // Step 4: Optimization (if enabled)
+    let optimizedAst = ast;
+    if (this.options.optimization !== 'debug') {
+      const optimizer = new Optimizer({ level: this.options.optimization });
+      optimizedAst = optimizer.optimize(ast);
+    }
+
+    // Step 5: Code Generation
     const codegen = new CodeGenerator(this.options.optimization);
-    const output = codegen.generate(ast, symbolTable);
+    const output = codegen.generate(optimizedAst, symbolTable);
 
     return {
       success: true,
       output,
-      ast,
+      ast: optimizedAst,
       symbolTable,
       errors: [],
     };

@@ -1,6 +1,14 @@
 /**
  * NAMI Code Generator - Generates C code from AST
  * Requirements: 1.2, 1.4, 1.5, 4.2, 4.3, 4.6
+ * 
+ * Parameter Passing Strategy (Requirements 4.2 & 4.3):
+ * - All parameters are passed as nami_value_t (a tagged union struct)
+ * - The nami_value_t struct itself is passed by value
+ * - Primitives (int, float, bool, null) are stored directly in the union
+ *   → Modifications inside functions don't affect originals (pass-by-value semantics)
+ * - Complex types (arrays, objects, strings) are stored as pointers in the union
+ *   → Modifications inside functions affect originals (pass-by-reference semantics)
  */
 
 import {
@@ -257,11 +265,19 @@ export class CodeGenerator {
 
   private generateFunctionDeclaration(decl: FunctionDeclaration): void {
     const name = this.sanitizeIdentifier(decl.id.name);
+    
+    // Generate parameter list
+    // Requirements 4.2 & 4.3: Parameter passing semantics
+    // - Primitives (int, float, bool, null) are passed by value (stored directly in nami_value_t)
+    // - Complex types (arrays, objects, strings) are passed by reference (pointers stored in nami_value_t)
+    // The nami_value_t struct is passed by value, but contains pointers for complex types
     const params = decl.params
       .map((p) => `nami_value_t ${this.sanitizeIdentifier(p.name)}`)
       .join(', ');
 
     this.emit('');
+    this.emit(`// Function: ${name}`);
+    this.emit(`// Parameter passing: primitives by value, complex types by reference`);
     this.emit(`nami_value_t ${name}(${params || 'void'}) {`);
     this.indent++;
 

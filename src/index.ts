@@ -23,6 +23,17 @@ export type { CompilerOptions, CompilerResult, CompilerError } from './compiler'
 
 export { PrettyPrinter } from './printer';
 
+// Optimizer
+export { Optimizer, DeadCodeEliminator, FunctionInliner } from './optimizer';
+export type {
+  OptimizationLevel,
+  OptimizerOptions,
+  OptimizationStats,
+  DeadCodeStats,
+  InliningStats,
+  InliningOptions,
+} from './optimizer';
+
 // Type system
 export { Types, typeEquals, isAssignable, toCType, coerceTypes, typeToString } from './types';
 export type { NamiType, PrimitiveType, ArrayType, FunctionType, ObjectType } from './types';
