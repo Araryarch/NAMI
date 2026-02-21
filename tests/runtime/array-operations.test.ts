@@ -42,7 +42,9 @@ describe('Runtime Library - Array Operations', () => {
 
   describe('Basic Array Methods (Task 13.2)', () => {
     it('should implement nami_array_push for appending elements', () => {
-      expect(runtimeHeader).toContain('void nami_array_push(nami_array_t* arr, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'void nami_array_push(nami_array_t* arr, nami_value_t value)'
+      );
       expect(runtimeHeader).toContain('arr->items[arr->length++] = value;');
     });
 
@@ -70,7 +72,9 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should implement nami_array_slice for extracting sub-arrays', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_array_slice(nami_array_t* arr, int64_t start, int64_t end)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_array_slice(nami_array_t* arr, int64_t start, int64_t end)'
+      );
       expect(runtimeHeader).toContain('nami_array_create()');
     });
 
@@ -86,7 +90,9 @@ describe('Runtime Library - Array Operations', () => {
 
   describe('Higher-Order Array Methods (Task 13.3)', () => {
     it('should implement nami_array_map for transformation', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_array_map(nami_array_t* arr, nami_function_t fn)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_array_map(nami_array_t* arr, nami_function_t fn)'
+      );
       expect(runtimeHeader).toContain('fn(arr->items[i])');
     });
 
@@ -100,7 +106,9 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should implement nami_array_filter for selection', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_array_filter(nami_array_t* arr, nami_function_t fn)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_array_filter(nami_array_t* arr, nami_function_t fn)'
+      );
     });
 
     it('should check predicate result in nami_array_filter', () => {
@@ -113,7 +121,9 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should implement nami_array_foreach for iteration', () => {
-      expect(runtimeHeader).toContain('void nami_array_foreach(nami_array_t* arr, nami_function_t fn)');
+      expect(runtimeHeader).toContain(
+        'void nami_array_foreach(nami_array_t* arr, nami_function_t fn)'
+      );
       expect(runtimeHeader).toContain('fn(arr->items[i])');
     });
 
@@ -126,7 +136,9 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should implement nami_array_reduce for accumulation', () => {
-      expect(runtimeHeader).toContain('nami_value_t nami_array_reduce(nami_array_t* arr, nami_function2_t fn, nami_value_t initial)');
+      expect(runtimeHeader).toContain(
+        'nami_value_t nami_array_reduce(nami_array_t* arr, nami_function2_t fn, nami_value_t initial)'
+      );
       expect(runtimeHeader).toContain('nami_value_t acc = initial');
       expect(runtimeHeader).toContain('acc = fn(acc, arr->items[i])');
     });
@@ -158,8 +170,12 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should provide array get and set operations', () => {
-      expect(runtimeHeader).toContain('nami_value_t nami_array_get(nami_array_t* arr, int64_t index)');
-      expect(runtimeHeader).toContain('void nami_array_set(nami_array_t* arr, int64_t index, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'nami_value_t nami_array_get(nami_array_t* arr, int64_t index)'
+      );
+      expect(runtimeHeader).toContain(
+        'void nami_array_set(nami_array_t* arr, int64_t index, nami_value_t value)'
+      );
     });
   });
 });

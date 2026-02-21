@@ -1,0 +1,4 @@
+Error: Cannot divide by zero
+5
+Error: Invalid input
+10

@@ -124,16 +124,14 @@ export class DeadCodeEliminator {
       case 'TryCatchStatement':
         return {
           ...stmt,
-          block: this.optimizeBlock(stmt.block) as BlockStatement,
+          block: this.optimizeBlock(stmt.block),
           handler: stmt.handler
             ? {
                 ...stmt.handler,
-                body: this.optimizeBlock(stmt.handler.body) as BlockStatement,
+                body: this.optimizeBlock(stmt.handler.body),
               }
             : null,
-          finalizer: stmt.finalizer
-            ? (this.optimizeBlock(stmt.finalizer) as BlockStatement)
-            : null,
+          finalizer: stmt.finalizer ? this.optimizeBlock(stmt.finalizer) : null,
         };
 
       default:
@@ -194,7 +192,7 @@ export class DeadCodeEliminator {
   private optimizeFunction(func: FunctionDeclaration): FunctionDeclaration {
     return {
       ...func,
-      body: this.optimizeBlock(func.body) as BlockStatement,
+      body: this.optimizeBlock(func.body),
     };
   }
 

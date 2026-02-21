@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -49,7 +49,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement nami_tree_node_create helper', () => {
-      expect(runtimeHeader).toContain('nami_tree_node_t* nami_tree_node_create(nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'nami_tree_node_t* nami_tree_node_create(nami_value_t value)'
+      );
       expect(runtimeHeader).toContain('malloc(sizeof(nami_tree_node_t))');
     });
 
@@ -64,7 +66,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement nami_tree_insert for adding nodes', () => {
-      expect(runtimeHeader).toContain('void nami_tree_insert(nami_tree_t* tree, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'void nami_tree_insert(nami_tree_t* tree, nami_value_t value)'
+      );
     });
 
     it('should increment size when inserting', () => {
@@ -96,7 +100,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement inorder helper with correct traversal order', () => {
-      expect(runtimeHeader).toContain('void nami_tree_inorder_helper(nami_tree_node_t* node, nami_array_t* result)');
+      expect(runtimeHeader).toContain(
+        'void nami_tree_inorder_helper(nami_tree_node_t* node, nami_array_t* result)'
+      );
       const inorderHelper = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_tree_inorder_helper'),
         runtimeHeader.indexOf('nami_array_t* nami_tree_inorder(nami_tree_t* tree)')
@@ -123,7 +129,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement preorder helper with correct traversal order', () => {
-      expect(runtimeHeader).toContain('void nami_tree_preorder_helper(nami_tree_node_t* node, nami_array_t* result)');
+      expect(runtimeHeader).toContain(
+        'void nami_tree_preorder_helper(nami_tree_node_t* node, nami_array_t* result)'
+      );
       const preorderHelper = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_tree_preorder_helper'),
         runtimeHeader.indexOf('nami_array_t* nami_tree_preorder(nami_tree_t* tree)')
@@ -150,7 +158,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement postorder helper with correct traversal order', () => {
-      expect(runtimeHeader).toContain('void nami_tree_postorder_helper(nami_tree_node_t* node, nami_array_t* result)');
+      expect(runtimeHeader).toContain(
+        'void nami_tree_postorder_helper(nami_tree_node_t* node, nami_array_t* result)'
+      );
       const postorderHelper = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_tree_postorder_helper'),
         runtimeHeader.indexOf('nami_array_t* nami_tree_postorder(nami_tree_t* tree)')
@@ -183,11 +193,15 @@ describe('Runtime Library - Tree Data Structure', () => {
 
   describe('BST Operations (Task 17.3)', () => {
     it('should implement nami_tree_search for finding values', () => {
-      expect(runtimeHeader).toContain('bool nami_tree_search(nami_tree_t* tree, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'bool nami_tree_search(nami_tree_t* tree, nami_value_t value)'
+      );
     });
 
     it('should implement search helper with BST logic', () => {
-      expect(runtimeHeader).toContain('bool nami_tree_search_helper(nami_tree_node_t* node, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'bool nami_tree_search_helper(nami_tree_node_t* node, nami_value_t value)'
+      );
       const searchHelper = runtimeHeader.substring(
         runtimeHeader.indexOf('bool nami_tree_search_helper'),
         runtimeHeader.indexOf('bool nami_tree_search(nami_tree_t* tree')
@@ -216,7 +230,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should maintain BST ordering invariant during insertion', () => {
-      expect(runtimeHeader).toContain('nami_tree_node_t* nami_tree_insert_helper(nami_tree_node_t* node, nami_value_t value)');
+      expect(runtimeHeader).toContain(
+        'nami_tree_node_t* nami_tree_insert_helper(nami_tree_node_t* node, nami_value_t value)'
+      );
       const insertHelper = runtimeHeader.substring(
         runtimeHeader.indexOf('nami_tree_node_t* nami_tree_insert_helper'),
         runtimeHeader.indexOf('void nami_tree_insert(nami_tree_t* tree')
@@ -263,7 +279,9 @@ describe('Runtime Library - Tree Data Structure', () => {
         runtimeHeader.indexOf('void nami_tree_node_update_height')
       );
       expect(balanceFunc).toContain('if (node == NULL) return 0');
-      expect(balanceFunc).toContain('nami_tree_node_height(node->left) - nami_tree_node_height(node->right)');
+      expect(balanceFunc).toContain(
+        'nami_tree_node_height(node->left) - nami_tree_node_height(node->right)'
+      );
     });
 
     it('should implement nami_tree_node_update_height', () => {
@@ -278,7 +296,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement right rotation', () => {
-      expect(runtimeHeader).toContain('nami_tree_node_t* nami_tree_rotate_right(nami_tree_node_t* y)');
+      expect(runtimeHeader).toContain(
+        'nami_tree_node_t* nami_tree_rotate_right(nami_tree_node_t* y)'
+      );
       const rotateFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('nami_tree_node_t* nami_tree_rotate_right'),
         runtimeHeader.indexOf('nami_tree_node_t* nami_tree_rotate_left')
@@ -291,7 +311,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement left rotation', () => {
-      expect(runtimeHeader).toContain('nami_tree_node_t* nami_tree_rotate_left(nami_tree_node_t* x)');
+      expect(runtimeHeader).toContain(
+        'nami_tree_node_t* nami_tree_rotate_left(nami_tree_node_t* x)'
+      );
       const rotateFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('nami_tree_node_t* nami_tree_rotate_left'),
         runtimeHeader.indexOf('nami_tree_node_t* nami_tree_balance_node')
@@ -304,7 +326,9 @@ describe('Runtime Library - Tree Data Structure', () => {
     });
 
     it('should implement nami_tree_balance_node', () => {
-      expect(runtimeHeader).toContain('nami_tree_node_t* nami_tree_balance_node(nami_tree_node_t* node)');
+      expect(runtimeHeader).toContain(
+        'nami_tree_node_t* nami_tree_balance_node(nami_tree_node_t* node)'
+      );
     });
 
     it('should handle left-heavy case (balance > 1)', () => {
@@ -436,11 +460,11 @@ describe('Runtime Library - Tree Data Structure', () => {
         runtimeHeader.indexOf('// ── Tree Data Structure'),
         runtimeHeader.indexOf('#endif // NAMI_RUNTIME_H')
       );
-      
+
       // Count malloc vs free calls
       const allocCount = (treeSection.match(/malloc\(/g) || []).length;
       const freeCount = (treeSection.match(/free\(/g) || []).length;
-      
+
       expect(allocCount).toBeGreaterThan(0);
       expect(freeCount).toBeGreaterThan(0);
     });

@@ -1,0 +1,4 @@
+Hello, World!
+Nami supports basic features
+Variables, functions, loops, arrays, objects
+And more!

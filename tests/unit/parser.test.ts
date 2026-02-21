@@ -159,7 +159,9 @@ describe('Parser', () => {
     });
 
     it('should parse try-catch-finally block', () => {
-      const parser = new Parser('try { riskyOp(); } catch (err) { log(err); } finally { cleanup(); }');
+      const parser = new Parser(
+        'try { riskyOp(); } catch (err) { log(err); } finally { cleanup(); }'
+      );
       const ast = parser.parse();
       const stmt = ast.body[0] as any;
       expect(stmt.type).toBe('TryCatchStatement');
@@ -385,10 +387,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should have one error for the invalid statement
       expect(errors.length).toBeGreaterThan(0);
-      
+
       // Should still parse valid statements after error
       expect(ast.body.length).toBeGreaterThan(1);
     });
@@ -405,10 +407,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should have errors for the bad function
       expect(errors.length).toBeGreaterThan(0);
-      
+
       // Should still parse the good function
       expect(ast.body.length).toBeGreaterThan(0);
     });
@@ -425,10 +427,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should collect multiple errors
       expect(errors.length).toBeGreaterThanOrEqual(2);
-      
+
       // Should still parse valid statements
       expect(ast.body.length).toBeGreaterThan(0);
     });
@@ -438,14 +440,14 @@ describe('Parser', () => {
       const parser = new Parser(source);
       parser.parse();
       const errors = parser.getErrors();
-      
+
       expect(errors.length).toBeGreaterThan(0);
       const error = errors[0];
-      
+
       // Error should have line and column information
       expect(error.line).toBeGreaterThan(0);
       expect(error.column).toBeGreaterThan(0);
-      
+
       // Error should have a descriptive message
       expect(error.message).toBeTruthy();
       expect(error.message.length).toBeGreaterThan(0);
@@ -467,10 +469,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should have one error for invalid let statement
       expect(errors.length).toBeGreaterThan(0);
-      
+
       // Should parse all valid statements after error
       expect(ast.body.length).toBeGreaterThan(1);
     });
@@ -488,10 +490,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should have error for invalid statement
       expect(errors.length).toBeGreaterThan(0);
-      
+
       // Should still parse the outer function (and possibly recovered statements)
       expect(ast.body.length).toBeGreaterThanOrEqual(1);
       expect(ast.body[0].type).toBe('FunctionDeclaration');
@@ -508,10 +510,10 @@ describe('Parser', () => {
       const parser = new Parser(source);
       const ast = parser.parse();
       const errors = parser.getErrors();
-      
+
       // Should have error for invalid let
       expect(errors.length).toBeGreaterThan(0);
-      
+
       // Should parse NAMI-specific statements
       expect(ast.body.length).toBeGreaterThan(1);
     });

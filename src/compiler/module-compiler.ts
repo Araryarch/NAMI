@@ -143,17 +143,17 @@ export class ModuleCompiler {
     // Enhance header with proper include guards and dependencies
     const fileName = node.path ? path.basename(node.path, '.nm') : 'module';
     const guardName = `NAMI_${fileName.toUpperCase().replace(/[^A-Z0-9]/g, '_')}_H`;
-    
+
     const includes = generateIncludeDirectives(node, graph);
-    
+
     let enhancedHeader = `#ifndef ${guardName}\n`;
     enhancedHeader += `#define ${guardName}\n\n`;
     enhancedHeader += `#include "nami_runtime.h"\n`;
-    
+
     for (const include of includes) {
       enhancedHeader += `${include}\n`;
     }
-    
+
     enhancedHeader += '\n';
     enhancedHeader += generated.headerFile;
     enhancedHeader += `\n#endif // ${guardName}\n`;
@@ -193,7 +193,7 @@ export class ModuleCompiler {
     // Copy runtime header
     const runtimeHeaderSrc = path.join(__dirname, '../../runtime/nami_runtime.h');
     const runtimeHeaderDest = path.join(outputDir, 'nami_runtime.h');
-    
+
     if (fs.existsSync(runtimeHeaderSrc)) {
       fs.copyFileSync(runtimeHeaderSrc, runtimeHeaderDest);
     }

@@ -5,10 +5,7 @@ describe('Runtime Library - Infinite Loop Detection', () => {
   let runtimeHeader: string;
 
   beforeAll(() => {
-    runtimeHeader = readFileSync(
-      join(__dirname, '../../runtime/nami_runtime.h'),
-      'utf-8'
-    );
+    runtimeHeader = readFileSync(join(__dirname, '../../runtime/nami_runtime.h'), 'utf-8');
   });
 
   describe('Task 9.1: Core Infrastructure', () => {
@@ -98,7 +95,7 @@ describe('Runtime Library - Infinite Loop Detection', () => {
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK(guard)'),
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK_SIMPLE')
       );
-      
+
       expect(loopCheckMacro).toContain('Location:');
       expect(loopCheckMacro).toContain('(guard)->file');
       expect(loopCheckMacro).toContain('(guard)->line');
@@ -160,7 +157,7 @@ describe('Runtime Library - Infinite Loop Detection', () => {
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK(guard)'),
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK_SIMPLE')
       );
-      
+
       expect(loopCheckMacro).toContain('(guard)->file');
       expect(loopCheckMacro).toContain('(guard)->line');
       expect(loopCheckMacro).toContain('Location:');
@@ -171,7 +168,7 @@ describe('Runtime Library - Infinite Loop Detection', () => {
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK(guard)'),
         runtimeHeader.indexOf('#define NAMI_LOOP_CHECK_SIMPLE')
       );
-      
+
       expect(loopCheckMacro).toContain('(guard)->loop_type');
       expect(loopCheckMacro).toContain('Loop type:');
     });

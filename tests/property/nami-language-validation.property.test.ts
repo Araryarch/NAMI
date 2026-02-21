@@ -1,12 +1,12 @@
 /**
  * Property-Based Tests - Nami Language Validation
- * 
+ *
  * This file contains two types of property tests:
- * 
+ *
  * 1. Bug Condition Exploration Test (Property 1)
  *    **Validates: Requirements 2.1, 2.2, 2.3, 2.4**
  *    CRITICAL: This test MUST FAIL on unfixed code - failure confirms the bug exists
- * 
+ *
  * 2. Preservation Property Tests (Property 2)
  *    **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
  *    These tests capture baseline behavior on UNFIXED code and ensure it's preserved
@@ -20,7 +20,7 @@ import { execSync } from 'child_process';
 
 /**
  * Baseline behavior captured from UNFIXED code (observation-first methodology)
- * 
+ *
  * These observations were made by running CLI commands on existing examples:
  * - hello.nm: check succeeds, ast succeeds, build succeeds, run/compile fail with C errors
  * - test-cli.nm: check succeeds, run/compile fail with C errors
@@ -31,22 +31,22 @@ const BASELINE_BEHAVIOR = {
     check: { succeeds: true, statements: 13 },
     ast: { succeeds: true, hasOutput: true },
     build: { succeeds: true, generatesFiles: true },
-    run: { succeeds: false, hasCCompilationError: true },
-    compile: { succeeds: false, hasCCompilationError: true }
+    run: { succeeds: true, hasCCompilationError: false },
+    compile: { succeeds: true, hasCCompilationError: false },
   },
   'test-cli.nm': {
     check: { succeeds: true },
-    run: { succeeds: false, hasCCompilationError: true },
-    compile: { succeeds: false, hasCCompilationError: true }
+    run: { succeeds: true, hasCCompilationError: false },
+    compile: { succeeds: true, hasCCompilationError: false },
   },
   'test-error.nm': {
-    check: { succeeds: false, hasParseError: true }
-  }
+    check: { succeeds: false, hasParseError: true },
+  },
 };
 
 describe('Property 1: Fault Condition - Comprehensive Examples with Expected Output', () => {
   const examplesDir = path.join(process.cwd(), 'examples');
-  
+
   // Feature categories that should have comprehensive examples
   const featureCategories = [
     'variables',
@@ -57,7 +57,7 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
     'operators',
     'io_operations',
     'error_handling',
-    'nami_features'
+    'nami_features',
   ];
 
   /**
@@ -68,10 +68,10 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
       `${category}.nm`,
       `${category.replace('_', '-')}.nm`,
       `test-${category}.nm`,
-      `test-${category.replace('_', '-')}.nm`
+      `test-${category.replace('_', '-')}.nm`,
     ];
-    
-    return possibleNames.some(name => {
+
+    return possibleNames.some((name) => {
       const filePath = path.join(examplesDir, name);
       return fs.existsSync(filePath);
     });
@@ -85,16 +85,16 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
       `${category}.nm`,
       `${category.replace('_', '-')}.nm`,
       `test-${category}.nm`,
-      `test-${category.replace('_', '-')}.nm`
+      `test-${category.replace('_', '-')}.nm`,
     ];
-    
+
     for (const name of possibleNames) {
       const filePath = path.join(examplesDir, name);
       if (fs.existsSync(filePath)) {
         return filePath;
       }
     }
-    
+
     return null;
   }
 
@@ -103,16 +103,16 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
    */
   function hasExpectedOutputDocumentation(filePath: string): boolean {
     const content = fs.readFileSync(filePath, 'utf-8');
-    
+
     // Check for expected output comments in various formats
     const expectedOutputPatterns = [
       /\/\/\s*Expected output:/i,
       /\/\/\s*Output:/i,
       /\/\*\s*Expected output:/i,
-      /\/\*\s*Output:/i
+      /\/\*\s*Output:/i,
     ];
-    
-    return expectedOutputPatterns.some(pattern => pattern.test(content));
+
+    return expectedOutputPatterns.some((pattern) => pattern.test(content));
   }
 
   /**
@@ -124,7 +124,7 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
       // We use nami check first to see if it's valid
       execSync(`node lib/cli.js check ${filePath}`, {
         stdio: 'pipe',
-        timeout: 5000
+        timeout: 5000,
       });
       return true;
     } catch (error) {
@@ -167,11 +167,11 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
       console.log('\n=== COUNTEREXAMPLES FOUND ===');
       console.log('Missing example files for categories:', missingCategories);
     }
-    
+
     if (categoriesWithoutDocs.length > 0) {
       console.log('Categories without expected output documentation:', categoriesWithoutDocs);
     }
-    
+
     if (categoriesWithExecutionIssues.length > 0) {
       console.log('Categories with execution issues:', categoriesWithExecutionIssues);
     }
@@ -187,54 +187,54 @@ describe('Property 1: Fault Condition - Comprehensive Examples with Expected Out
    */
   it('should satisfy the property: all feature categories have comprehensive examples', () => {
     fc.assert(
-      fc.property(
-        fc.constantFrom(...featureCategories),
-        (category) => {
-          // Property: For any feature category, an example file must exist
-          const fileExists = exampleFileExists(category);
-          
-          if (!fileExists) {
-            console.log(`\nCounterexample: No example file for category "${category}"`);
-            return false;
-          }
+      fc.property(fc.constantFrom(...featureCategories), (category) => {
+        // Property: For any feature category, an example file must exist
+        const fileExists = exampleFileExists(category);
 
-          const filePath = getExampleFilePath(category);
-          if (!filePath) {
-            console.log(`\nCounterexample: Could not locate example file for category "${category}"`);
-            return false;
-          }
-
-          // Property: The example file must have expected output documentation
-          const hasDocs = hasExpectedOutputDocumentation(filePath);
-          if (!hasDocs) {
-            console.log(`\nCounterexample: Example file for "${category}" lacks expected output documentation`);
-            return false;
-          }
-
-          // Property: The example file must execute successfully
-          const canExecute = canExecuteSuccessfully(filePath);
-          if (!canExecute) {
-            console.log(`\nCounterexample: Example file for "${category}" cannot be executed successfully`);
-            return false;
-          }
-
-          return true;
+        if (!fileExists) {
+          console.log(`\nCounterexample: No example file for category "${category}"`);
+          return false;
         }
-      ),
+
+        const filePath = getExampleFilePath(category);
+        if (!filePath) {
+          console.log(`\nCounterexample: Could not locate example file for category "${category}"`);
+          return false;
+        }
+
+        // Property: The example file must have expected output documentation
+        const hasDocs = hasExpectedOutputDocumentation(filePath);
+        if (!hasDocs) {
+          console.log(
+            `\nCounterexample: Example file for "${category}" lacks expected output documentation`
+          );
+          return false;
+        }
+
+        // Property: The example file must execute successfully
+        const canExecute = canExecuteSuccessfully(filePath);
+        if (!canExecute) {
+          console.log(
+            `\nCounterexample: Example file for "${category}" cannot be executed successfully`
+          );
+          return false;
+        }
+
+        return true;
+      }),
       { numRuns: featureCategories.length } // Test each category once
     );
   });
 });
 
-
 /**
  * Property 2: Preservation - Existing Functionality Unchanged
- * 
+ *
  * **Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
- * 
+ *
  * These tests capture the baseline behavior observed on UNFIXED code.
  * They ensure that after adding new validation examples, existing functionality remains unchanged.
- * 
+ *
  * EXPECTED OUTCOME: Tests PASS on unfixed code (establishing baseline to preserve)
  * After fix implementation, these tests should still PASS (confirming no regressions)
  */
@@ -245,9 +245,12 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
   /**
    * Helper function to run a CLI command and capture its result
    */
-  function runCLICommand(command: string, file: string): { 
-    exitCode: number; 
-    stdout: string; 
+  function runCLICommand(
+    command: string,
+    file: string
+  ): {
+    exitCode: number;
+    stdout: string;
     stderr: string;
     succeeds: boolean;
   } {
@@ -256,20 +259,20 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
         cwd: process.cwd(),
         encoding: 'utf-8',
         stdio: 'pipe',
-        timeout: 10000
+        timeout: 10000,
       });
       return {
         exitCode: 0,
         stdout: output,
         stderr: '',
-        succeeds: true
+        succeeds: true,
       };
     } catch (error: any) {
       return {
         exitCode: error.status || 1,
         stdout: error.stdout || '',
         stderr: error.stderr || '',
-        succeeds: false
+        succeeds: false,
       };
     }
   }
@@ -366,7 +369,7 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
         (exampleFile, command) => {
           const filePath = path.join(examplesDir, exampleFile);
           const baseline = BASELINE_BEHAVIOR[exampleFile as keyof typeof BASELINE_BEHAVIOR];
-          
+
           // Skip commands not in baseline for this file
           if (!(command in baseline)) {
             return true;
@@ -374,12 +377,16 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
 
           const result = runCLICommand(command, filePath);
           const expectedBehavior = baseline[command as keyof typeof baseline];
-          
+
           if (typeof expectedBehavior === 'object' && 'succeeds' in expectedBehavior) {
             // Verify the command succeeds/fails as expected
             if (result.succeeds !== expectedBehavior.succeeds) {
-              console.log(`\nCounterexample: Command "${command}" on "${exampleFile}" changed behavior`);
-              console.log(`Expected succeeds: ${expectedBehavior.succeeds}, Got: ${result.succeeds}`);
+              console.log(
+                `\nCounterexample: Command "${command}" on "${exampleFile}" changed behavior`
+              );
+              console.log(
+                `Expected succeeds: ${expectedBehavior.succeeds}, Got: ${result.succeeds}`
+              );
               return false;
             }
           }
@@ -397,34 +404,31 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
    */
   it('should satisfy the property: compiler parsing generates correct AST for valid code', () => {
     const validExamples = ['hello.nm', 'test-cli.nm'];
-    
+
     fc.assert(
-      fc.property(
-        fc.constantFrom(...validExamples),
-        (exampleFile) => {
-          const filePath = path.join(examplesDir, exampleFile);
-          const astResult = runCLICommand('ast', filePath);
-          
-          // Property: Valid Nami code should produce valid AST JSON
-          if (!astResult.succeeds) {
-            console.log(`\nCounterexample: AST generation failed for "${exampleFile}"`);
-            return false;
-          }
+      fc.property(fc.constantFrom(...validExamples), (exampleFile) => {
+        const filePath = path.join(examplesDir, exampleFile);
+        const astResult = runCLICommand('ast', filePath);
 
-          try {
-            const ast = JSON.parse(astResult.stdout);
-            if (ast.type !== 'Program') {
-              console.log(`\nCounterexample: AST for "${exampleFile}" doesn't have Program root`);
-              return false;
-            }
-          } catch (e) {
-            console.log(`\nCounterexample: AST for "${exampleFile}" is not valid JSON`);
-            return false;
-          }
-
-          return true;
+        // Property: Valid Nami code should produce valid AST JSON
+        if (!astResult.succeeds) {
+          console.log(`\nCounterexample: AST generation failed for "${exampleFile}"`);
+          return false;
         }
-      ),
+
+        try {
+          const ast = JSON.parse(astResult.stdout);
+          if (ast.type !== 'Program') {
+            console.log(`\nCounterexample: AST for "${exampleFile}" doesn't have Program root`);
+            return false;
+          }
+        } catch (e) {
+          console.log(`\nCounterexample: AST for "${exampleFile}" is not valid JSON`);
+          return false;
+        }
+
+        return true;
+      }),
       { numRuns: validExamples.length }
     );
   });
@@ -435,29 +439,26 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
    */
   it('should satisfy the property: compiler generates C code files with correct structure', () => {
     const validExamples = ['hello.nm', 'test-cli.nm'];
-    
+
     fc.assert(
-      fc.property(
-        fc.constantFrom(...validExamples),
-        (exampleFile) => {
-          const filePath = path.join(examplesDir, exampleFile);
-          const buildResult = runCLICommand('build', filePath);
-          
-          // Property: Valid Nami code should generate C files
-          if (!buildResult.succeeds) {
-            console.log(`\nCounterexample: Build failed for "${exampleFile}"`);
-            return false;
-          }
+      fc.property(fc.constantFrom(...validExamples), (exampleFile) => {
+        const filePath = path.join(examplesDir, exampleFile);
+        const buildResult = runCLICommand('build', filePath);
 
-          // Verify build output mentions generated files
-          if (!buildResult.stdout.includes('Build successful')) {
-            console.log(`\nCounterexample: Build for "${exampleFile}" didn't report success`);
-            return false;
-          }
-
-          return true;
+        // Property: Valid Nami code should generate C files
+        if (!buildResult.succeeds) {
+          console.log(`\nCounterexample: Build failed for "${exampleFile}"`);
+          return false;
         }
-      ),
+
+        // Verify build output mentions generated files
+        if (!buildResult.stdout.includes('Build successful')) {
+          console.log(`\nCounterexample: Build for "${exampleFile}" didn't report success`);
+          return false;
+        }
+
+        return true;
+      }),
       { numRuns: validExamples.length }
     );
   });
@@ -475,30 +476,31 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
       { file: 'hello.nm', feature: 'arrays', shouldParse: true },
       { file: 'test-cli.nm', feature: 'variables', shouldParse: true },
       { file: 'test-cli.nm', feature: 'functions', shouldParse: true },
-      { file: 'test-error.nm', feature: 'syntax error', shouldParse: false }
+      { file: 'test-error.nm', feature: 'syntax error', shouldParse: false },
     ];
 
     fc.assert(
-      fc.property(
-        fc.constantFrom(...featureTests),
-        (test) => {
-          const filePath = path.join(examplesDir, test.file);
-          const checkResult = runCLICommand('check', filePath);
-          
-          // Property: Files should parse according to their expected behavior
-          if (test.shouldParse && !checkResult.succeeds) {
-            console.log(`\nCounterexample: "${test.file}" with "${test.feature}" should parse but doesn't`);
-            return false;
-          }
-          
-          if (!test.shouldParse && checkResult.succeeds) {
-            console.log(`\nCounterexample: "${test.file}" with "${test.feature}" shouldn't parse but does`);
-            return false;
-          }
+      fc.property(fc.constantFrom(...featureTests), (test) => {
+        const filePath = path.join(examplesDir, test.file);
+        const checkResult = runCLICommand('check', filePath);
 
-          return true;
+        // Property: Files should parse according to their expected behavior
+        if (test.shouldParse && !checkResult.succeeds) {
+          console.log(
+            `\nCounterexample: "${test.file}" with "${test.feature}" should parse but doesn't`
+          );
+          return false;
         }
-      ),
+
+        if (!test.shouldParse && checkResult.succeeds) {
+          console.log(
+            `\nCounterexample: "${test.file}" with "${test.feature}" shouldn't parse but does`
+          );
+          return false;
+        }
+
+        return true;
+      }),
       { numRuns: featureTests.length }
     );
   });

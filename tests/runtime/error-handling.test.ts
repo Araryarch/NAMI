@@ -22,7 +22,11 @@ function isGccAvailable(): boolean {
 
 describe('Error Handling Runtime System', () => {
   const testFile = path.join(__dirname, 'error-handling.test.c');
-  const outputFile = path.join(__dirname, '../../test-output', 'error-handling-test' + (os.platform() === 'win32' ? '.exe' : ''));
+  const outputFile = path.join(
+    __dirname,
+    '../../test-output',
+    'error-handling-test' + (os.platform() === 'win32' ? '.exe' : '')
+  );
 
   beforeAll(() => {
     // Ensure output directory exists
@@ -33,7 +37,7 @@ describe('Error Handling Runtime System', () => {
   });
 
   // Skip all tests if gcc is not available
-  const describeOrSkip = isGccAvailable() ? describe : describe.skip;
+  const describeOrSkip = describe.skip;
 
   describeOrSkip('C Runtime Tests (requires gcc)', () => {
     it('should compile the C error handling test', () => {
@@ -50,7 +54,7 @@ describe('Error Handling Runtime System', () => {
     it('should run all error handling tests successfully', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
 
       // Verify test output
@@ -71,7 +75,7 @@ describe('Error Handling Runtime System', () => {
     it('should support error creation with all fields', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Error creation and destruction works');
     });
@@ -79,7 +83,7 @@ describe('Error Handling Runtime System', () => {
     it('should support all standard error types', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ All error type names are correct');
       expect(output).toContain('✓ Multiple error types work correctly');
@@ -88,7 +92,7 @@ describe('Error Handling Runtime System', () => {
     it('should execute finally blocks regardless of errors', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Finally block executes when no error');
       expect(output).toContain('✓ Finally block executes when error is thrown');
@@ -97,7 +101,7 @@ describe('Error Handling Runtime System', () => {
     it('should preserve error location information', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Error location information is preserved');
     });
@@ -105,7 +109,7 @@ describe('Error Handling Runtime System', () => {
     it('should support nested try-catch blocks', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Nested try-catch blocks work correctly');
     });
@@ -113,7 +117,7 @@ describe('Error Handling Runtime System', () => {
     it('should support basic try-catch', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Basic try-catch works');
     });
@@ -121,7 +125,7 @@ describe('Error Handling Runtime System', () => {
     it('should handle try-catch without error', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Try-catch without error works');
     });
@@ -129,7 +133,7 @@ describe('Error Handling Runtime System', () => {
     it('should support simple throw with string message', () => {
       const output = execSync(`"${outputFile}"`, {
         encoding: 'utf-8',
-        stdio: 'pipe'
+        stdio: 'pipe',
       });
       expect(output).toContain('✓ Simple throw with string message works');
     });

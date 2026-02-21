@@ -92,12 +92,12 @@ export class Parser {
         .tokenize()
         .filter((t) => t.type !== TokenType.COMMENT && t.type !== TokenType.BLOCK_COMMENT);
     }
-    
+
     // Ensure we have at least an EOF token
     if (this.tokens.length === 0) {
       this.tokens = [new Token(TokenType.EOF, '', 1, 1, 0)];
     }
-    
+
     this.current = 0;
     this.errors = [];
 
@@ -1542,7 +1542,7 @@ export class Parser {
     return new ParseError(message, token, token.line, token.column);
   }
 
-  /** 
+  /**
    * Error recovery: Skip tokens until a statement boundary
    * Synchronizes on:
    * - Semicolons (statement terminators)
@@ -1554,15 +1554,15 @@ export class Parser {
     this.advance();
     while (!this.isAtEnd()) {
       const prevToken = this.tokens[this.current - 1];
-      
+
       // Synchronize on semicolons
       if (prevToken.type === TokenType.SEMICOLON) return;
-      
+
       // Synchronize on closing braces (end of block)
       if (prevToken.type === TokenType.RIGHT_BRACE) return;
 
       const currentToken = this.peek();
-      
+
       // Synchronize on opening braces (start of block)
       if (currentToken.type === TokenType.LEFT_BRACE) return;
 

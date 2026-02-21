@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -57,7 +57,9 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
     });
 
     it('should implement nami_graph_add_edge for adding weighted edges', () => {
-      expect(runtimeHeader).toContain('void nami_graph_add_edge(nami_graph_t* graph, int64_t from, int64_t to, double weight)');
+      expect(runtimeHeader).toContain(
+        'void nami_graph_add_edge(nami_graph_t* graph, int64_t from, int64_t to, double weight)'
+      );
     });
 
     it('should validate vertex indices in nami_graph_add_edge', () => {
@@ -83,7 +85,9 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
 
   describe('Graph Traversal Algorithms (Task 16.2)', () => {
     it('should implement nami_graph_bfs for breadth-first search', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_graph_bfs(nami_graph_t* graph, int64_t start)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_graph_bfs(nami_graph_t* graph, int64_t start)'
+      );
     });
 
     it('should use queue for BFS traversal', () => {
@@ -125,7 +129,9 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
     });
 
     it('should implement nami_graph_dfs for depth-first search', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_graph_dfs(nami_graph_t* graph, int64_t start)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_graph_dfs(nami_graph_t* graph, int64_t start)'
+      );
     });
 
     it('should use stack for DFS traversal', () => {
@@ -169,7 +175,9 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
 
   describe('Shortest Path Algorithms (Task 16.3)', () => {
     it('should implement nami_graph_dijkstra for shortest path', () => {
-      expect(runtimeHeader).toContain('nami_object_t* nami_graph_dijkstra(nami_graph_t* graph, int64_t start, int64_t end)');
+      expect(runtimeHeader).toContain(
+        'nami_object_t* nami_graph_dijkstra(nami_graph_t* graph, int64_t start, int64_t end)'
+      );
     });
 
     it('should initialize distances array in Dijkstra', () => {
@@ -254,7 +262,9 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
     });
 
     it('should implement nami_graph_astar for heuristic pathfinding', () => {
-      expect(runtimeHeader).toContain('nami_array_t* nami_graph_astar(nami_graph_t* graph, int64_t start, int64_t end, nami_function_t heuristic)');
+      expect(runtimeHeader).toContain(
+        'nami_array_t* nami_graph_astar(nami_graph_t* graph, int64_t start, int64_t end, nami_function_t heuristic)'
+      );
     });
 
     it('should use heuristic function in A*', () => {
@@ -362,11 +372,11 @@ describe('Runtime Library - Graph Data Structure and Algorithms', () => {
         runtimeHeader.indexOf('// ── Graph Data Structure'),
         runtimeHeader.indexOf('#endif // NAMI_RUNTIME_H')
       );
-      
+
       // Count malloc/calloc vs free calls (should be balanced)
       const allocCount = (graphSection.match(/malloc\(|calloc\(/g) || []).length;
       const freeCount = (graphSection.match(/free\(/g) || []).length;
-      
+
       // We expect at least some memory management
       expect(allocCount).toBeGreaterThan(0);
       expect(freeCount).toBeGreaterThan(0);

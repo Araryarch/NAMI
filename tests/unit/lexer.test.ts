@@ -180,7 +180,7 @@ describe('Lexer', () => {
       expect(tokens[1].type).toBe(TokenType.NUMBER);
       expect(tokens[1].literal).toBe(3.14);
       expect(tokens[2].type).toBe(TokenType.NUMBER);
-      expect(tokens[2].literal).toBe(0x1A);
+      expect(tokens[2].literal).toBe(0x1a);
       expect(tokens[3].type).toBe(TokenType.NUMBER);
       expect(tokens[3].literal).toBe(0b1010);
       expect(tokens[4].type).toBe(TokenType.NUMBER);
@@ -214,7 +214,7 @@ describe('Lexer', () => {
     });
 
     it('should handle multi-line strings with single quotes', () => {
-      const source = '\'first line\nsecond line\'';
+      const source = "'first line\nsecond line'";
       const lexer = new Lexer(source);
       const tokens = lexer.tokenize();
 

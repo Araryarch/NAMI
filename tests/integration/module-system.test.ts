@@ -101,7 +101,7 @@ print(result);
       const graph = buildDependencyGraph(mainFile);
 
       expect(graph.nodes.size).toBeGreaterThanOrEqual(2);
-      
+
       // Check that all modules are in the graph
       const mainNode = graph.nodes.get(path.resolve(mainFile));
       expect(mainNode).toBeDefined();
@@ -275,7 +275,7 @@ let result = add(1, 2);
       const order = getTopologicalOrder(graph);
 
       expect(order.length).toBeGreaterThan(0);
-      
+
       // Main file should be last (depends on others)
       expect(order[order.length - 1]).toBe(path.resolve(mainFile));
     });

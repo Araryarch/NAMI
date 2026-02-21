@@ -1,7 +1,7 @@
 /**
  * NAMI Code Generator - Generates C code from AST
  * Requirements: 1.2, 1.4, 1.5, 4.2, 4.3, 4.6
- * 
+ *
  * Parameter Passing Strategy (Requirements 4.2 & 4.3):
  * - All parameters are passed as nami_value_t (a tagged union struct)
  * - The nami_value_t struct itself is passed by value
@@ -263,10 +263,9 @@ export class CodeGenerator {
     }
   }
 
-
   private generateFunctionDeclaration(decl: FunctionDeclaration): void {
     const name = this.sanitizeIdentifier(decl.id.name);
-    
+
     // Generate parameter list
     // Requirements 4.2 & 4.3: Parameter passing semantics
     // - Primitives (int, float, bool, null) are passed by value (stored directly in nami_value_t)
@@ -721,6 +720,55 @@ export class CodeGenerator {
   }
 
   private generateAssignmentExpression(expr: import('../parser/ast').AssignmentExpression): string {
+    // Check if left side is member expression (array[index] or obj.prop)
+    if (expr.left.type === 'MemberExpression') {
+      const member = expr.left;
+      const obj = this.generateExpression(member.object);
+      const right = this.generateExpression(expr.right);
+
+      if (member.computed) {
+        // Array access: arr[index] = value
+        const key = this.generateExpression(member.property);
+        if (expr.operator === '=') {
+          return `(nami_set(${obj}, ${key}, ${right}), ${right})`;
+        } else {
+          // Compound assignment: arr[index] += value
+          const opMap: Record<string, string> = {
+            '+=': 'nami_add',
+            '-=': 'nami_sub',
+            '*=': 'nami_mul',
+            '/=': 'nami_div',
+            '%=': 'nami_mod',
+          };
+          const func = opMap[expr.operator];
+          if (func) {
+            const temp = `nami_get(${obj}, ${key})`;
+            return `(nami_set(${obj}, ${key}, ${func}(${temp}, ${right})), ${func}(${temp}, ${right}))`;
+          }
+        }
+      } else {
+        // Object property: obj.prop = value
+        const prop = (member.property as import('../parser/ast').Identifier).name;
+        if (expr.operator === '=') {
+          return `(nami_set_prop(${obj}, "${prop}", ${right}), ${right})`;
+        } else {
+          const opMap: Record<string, string> = {
+            '+=': 'nami_add',
+            '-=': 'nami_sub',
+            '*=': 'nami_mul',
+            '/=': 'nami_div',
+            '%=': 'nami_mod',
+          };
+          const func = opMap[expr.operator];
+          if (func) {
+            const temp = `nami_get_prop(${obj}, "${prop}")`;
+            return `(nami_set_prop(${obj}, "${prop}", ${func}(${temp}, ${right})), ${func}(${temp}, ${right}))`;
+          }
+        }
+      }
+    }
+
+    // Regular variable assignment
     const left = this.generateExpression(expr.left);
     const right = this.generateExpression(expr.right);
 
@@ -754,6 +802,10 @@ export class CodeGenerator {
           return `nami_print(${args})`;
         case 'println':
           return `nami_println(${args})`;
+        case 'printf':
+          return `nami_printf(${args})`;
+        case 'printfln':
+          return `nami_printfln(${args})`;
         case 'input':
           return 'nami_input()';
         case 'parseInt':

@@ -5,10 +5,7 @@ describe('Runtime Library - I/O Functions', () => {
   let runtimeHeader: string;
 
   beforeAll(() => {
-    runtimeHeader = readFileSync(
-      join(__dirname, '../../runtime/nami_runtime.h'),
-      'utf-8'
-    );
+    runtimeHeader = readFileSync(join(__dirname, '../../runtime/nami_runtime.h'), 'utf-8');
   });
 
   describe('Task 11.1: Print and Println Functions', () => {
@@ -69,8 +66,9 @@ describe('Runtime Library - I/O Functions', () => {
       expect(printValueFunc).toContain('"true"'); // BOOL true
       expect(printValueFunc).toContain('"false"'); // BOOL false
       expect(printValueFunc).toContain('"null"'); // NULL
-      expect(printValueFunc).toContain('"[Array]"'); // ARRAY
-      expect(printValueFunc).toContain('"[Object]"'); // OBJECT
+      // Arrays and objects now print their contents, not just "[Array]" or "[Object]"
+      expect(printValueFunc).toContain('NAMI_TYPE_ARRAY'); // ARRAY
+      expect(printValueFunc).toContain('NAMI_TYPE_OBJECT'); // OBJECT
       expect(printValueFunc).toContain('"[Function]"'); // FUNCTION
     });
 
@@ -95,7 +93,7 @@ describe('Runtime Library - I/O Functions', () => {
       // Check for newline stripping
       expect(inputFunc).toContain("buffer[len - 1] == '\\n'");
       expect(inputFunc).toContain("buffer[len - 1] = '\\0'");
-      
+
       // Check for carriage return stripping (Windows line endings)
       expect(inputFunc).toContain("buffer[len - 1] == '\\r'");
     });
@@ -141,12 +139,12 @@ describe('Runtime Library - I/O Functions', () => {
     test('Requirements 2.3: Print handles multiple arguments with space separation', () => {
       expect(runtimeHeader).toContain('nami_print_multi(int count, ...)');
       expect(runtimeHeader).toContain('printf(" ")');
-      
+
       const printMultiFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('nami_print_multi(int count, ...)'),
         runtimeHeader.indexOf('nami_println_multi(int count, ...)')
       );
-      
+
       expect(printMultiFunc).toContain('if (i > 0)');
       expect(printMultiFunc).toContain('printf(" ")');
     });

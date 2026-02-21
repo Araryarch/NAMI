@@ -84,7 +84,7 @@ export const Types = {
 export function typeEquals(a: NamiType, b: NamiType): boolean {
   // Any type equals everything
   if (a.kind === 'any' || b.kind === 'any') return true;
-  
+
   if (a.kind !== b.kind) return false;
   if (a.kind === 'primitive' && b.kind === 'primitive') {
     return a.name === b.name;

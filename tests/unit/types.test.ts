@@ -404,9 +404,7 @@ describe('Type System - Edge Cases', () => {
       [Types.array(Types.int()), Types.function([Types.string()], Types.bool())],
       Types.array(Types.string())
     );
-    expect(typeToString(complexFunc)).toBe(
-      '(Array<int>, (string) => bool) => Array<string>'
-    );
+    expect(typeToString(complexFunc)).toBe('(Array<int>, (string) => bool) => Array<string>');
   });
 
   it('should handle pointer to pointer', () => {

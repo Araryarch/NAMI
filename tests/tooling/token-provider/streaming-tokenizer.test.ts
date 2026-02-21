@@ -50,38 +50,38 @@ describe('StreamingTokenizer', () => {
 
     it('should provide progress callbacks', async () => {
       const progressUpdates: number[] = [];
-      const options: StreamingOptions = { 
+      const options: StreamingOptions = {
         chunkSize: 30,
-        onProgress: (progress) => progressUpdates.push(progress)
+        onProgress: (progress) => progressUpdates.push(progress),
       };
       streamingTokenizer = new StreamingTokenizer(tokenProvider, options);
-      
+
       const functionDef = 'fn test() { print("hello"); }\n';
-      const source = functionDef.repeat(5);
-      
+      const source = functionDef.repeat(50); // Increased to trigger streaming
+
       await streamingTokenizer.tokenizeStream(source);
-      
+
       expect(progressUpdates.length).toBeGreaterThan(0);
       expect(progressUpdates[progressUpdates.length - 1]).toBe(1); // Should end at 100%
-      expect(progressUpdates.every(p => p >= 0 && p <= 1)).toBe(true);
+      expect(progressUpdates.every((p) => p >= 0 && p <= 1)).toBe(true);
     });
 
     it('should provide chunk callbacks', async () => {
       const chunks: any[] = [];
-      const options: StreamingOptions = { 
+      const options: StreamingOptions = {
         chunkSize: 40,
-        onTokenChunk: (tokens, chunkIndex) => chunks.push({ tokens, chunkIndex })
+        onTokenChunk: (tokens, chunkIndex) => chunks.push({ tokens, chunkIndex }),
       };
       streamingTokenizer = new StreamingTokenizer(tokenProvider, options);
-      
+
       const functionDef = 'fn test() { print("hello"); }\n';
-      const source = functionDef.repeat(3);
-      
+      const source = functionDef.repeat(100); // Increased to trigger streaming
+
       await streamingTokenizer.tokenizeStream(source);
-      
+
       expect(chunks.length).toBeGreaterThan(0);
-      expect(chunks.every(chunk => Array.isArray(chunk.tokens))).toBe(true);
-      expect(chunks.every(chunk => typeof chunk.chunkIndex === 'number')).toBe(true);
+      expect(chunks.every((chunk) => Array.isArray(chunk.tokens))).toBe(true);
+      expect(chunks.every((chunk) => typeof chunk.chunkIndex === 'number')).toBe(true);
     });
   });
 

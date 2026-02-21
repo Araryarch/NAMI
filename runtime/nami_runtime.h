@@ -431,6 +431,32 @@ static inline nami_value_t nami_object_get(nami_object_t* obj, const char* key) 
     return NAMI_NULL;
 }
 
+static inline nami_value_t nami_object_create(void) {
+    nami_value_t val;
+    val.type = NAMI_TYPE_OBJECT;
+    val.value.as_object = nami_object_create_empty();
+    return val;
+}
+
+static inline nami_value_t nami_object_of(int count, ...) {
+    nami_object_t* obj = nami_object_create_empty();
+    va_list args;
+    va_start(args, count);
+    
+    for (int i = 0; i < count; i++) {
+        const char* key = va_arg(args, const char*);
+        nami_value_t value = va_arg(args, nami_value_t);
+        nami_object_set(obj, key, value);
+    }
+    
+    va_end(args);
+    
+    nami_value_t val;
+    val.type = NAMI_TYPE_OBJECT;
+    val.value.as_object = obj;
+    return val;
+}
+
 // ── Garbage Collector ───────────────────────────────────
 
 struct nami_gc_object {
@@ -828,6 +854,58 @@ static inline nami_value_t nami_shr(nami_value_t a, nami_value_t b) {
 /**
  * Print a single value to stdout with appropriate formatting
  * Supports all NAMI data types
+/**
+ * Print a value for nested contexts (inside arrays/objects)
+ * Strings are printed WITHOUT quotes
+ */
+static inline void nami_print_value_nested(nami_value_t v) {
+    switch (v.type) {
+        case NAMI_TYPE_INT: 
+            printf("%lld", (long long)v.value.as_int); 
+            break;
+        case NAMI_TYPE_FLOAT: 
+            printf("%g", v.value.as_float); 
+            break;
+        case NAMI_TYPE_STRING: 
+            printf("%s", v.value.as_string->data); 
+            break;
+        case NAMI_TYPE_BOOL: 
+            printf("%s", v.value.as_bool ? "true" : "false"); 
+            break;
+        case NAMI_TYPE_NULL: 
+            printf("null"); 
+            break;
+        case NAMI_TYPE_ARRAY: {
+            nami_array_t* arr = v.value.as_array;
+            printf("[");
+            for (int64_t i = 0; i < arr->length; i++) {
+                if (i > 0) printf(",");
+                nami_print_value_nested(arr->items[i]);
+            }
+            printf("]");
+            break;
+        }
+        case NAMI_TYPE_OBJECT: {
+            nami_object_t* obj = v.value.as_object;
+            printf("{");
+            for (int64_t i = 0; i < obj->count; i++) {
+                if (i > 0) printf(",");
+                printf("%s:", obj->entries[i].key);
+                nami_print_value_nested(obj->entries[i].value);
+            }
+            printf("}");
+            break;
+        }
+        case NAMI_TYPE_FUNCTION: 
+            printf("[Function]"); 
+            break;
+    }
+}
+
+/**
+ * Print a single value to stdout with appropriate formatting
+ * Supports all NAMI data types
+ * Strings are printed without quotes (except in nested contexts)
  */
 static inline void nami_print_value(nami_value_t v) {
     switch (v.type) {
@@ -846,12 +924,27 @@ static inline void nami_print_value(nami_value_t v) {
         case NAMI_TYPE_NULL: 
             printf("null"); 
             break;
-        case NAMI_TYPE_ARRAY: 
-            printf("[Array]"); 
+        case NAMI_TYPE_ARRAY: {
+            nami_array_t* arr = v.value.as_array;
+            printf("[");
+            for (int64_t i = 0; i < arr->length; i++) {
+                if (i > 0) printf(",");
+                nami_print_value_nested(arr->items[i]);
+            }
+            printf("]");
             break;
-        case NAMI_TYPE_OBJECT: 
-            printf("[Object]"); 
+        }
+        case NAMI_TYPE_OBJECT: {
+            nami_object_t* obj = v.value.as_object;
+            printf("{");
+            for (int64_t i = 0; i < obj->count; i++) {
+                if (i > 0) printf(",");
+                printf("%s:", obj->entries[i].key);
+                nami_print_value_nested(obj->entries[i].value);
+            }
+            printf("}");
             break;
+        }
         case NAMI_TYPE_FUNCTION: 
             printf("[Function]"); 
             break;
@@ -873,6 +966,70 @@ static inline void nami_print(nami_value_t v) {
  */
 static inline void nami_println(nami_value_t v) {
     nami_print_value(v);
+    printf("\n");
+    fflush(stdout);
+}
+
+/**
+ * Print raw value to stdout (C-style, no formatting)
+ * Arrays print space-separated values without brackets
+ * Objects print key-value pairs without braces
+ */
+static inline void nami_printf_value(nami_value_t v) {
+    switch (v.type) {
+        case NAMI_TYPE_INT: 
+            printf("%lld", (long long)v.value.as_int); 
+            break;
+        case NAMI_TYPE_FLOAT: 
+            printf("%g", v.value.as_float); 
+            break;
+        case NAMI_TYPE_STRING: 
+            printf("%s", v.value.as_string->data); 
+            break;
+        case NAMI_TYPE_BOOL: 
+            printf("%s", v.value.as_bool ? "true" : "false"); 
+            break;
+        case NAMI_TYPE_NULL: 
+            printf("null"); 
+            break;
+        case NAMI_TYPE_ARRAY: {
+            nami_array_t* arr = v.value.as_array;
+            for (int64_t i = 0; i < arr->length; i++) {
+                if (i > 0) printf(" ");
+                nami_printf_value(arr->items[i]);
+            }
+            break;
+        }
+        case NAMI_TYPE_OBJECT: {
+            nami_object_t* obj = v.value.as_object;
+            for (int64_t i = 0; i < obj->count; i++) {
+                if (i > 0) printf(" ");
+                printf("%s:", obj->entries[i].key);
+                nami_printf_value(obj->entries[i].value);
+            }
+            break;
+        }
+        case NAMI_TYPE_FUNCTION: 
+            printf("[Function]"); 
+            break;
+    }
+}
+
+/**
+ * Low-level print (C-style, no newline)
+ * Arrays/objects show as [Array]/[Object]
+ */
+static inline void nami_printf(nami_value_t v) {
+    nami_printf_value(v);
+    fflush(stdout);
+}
+
+/**
+ * Low-level print with newline (C-style)
+ * Arrays/objects show as [Array]/[Object]
+ */
+static inline void nami_printfln(nami_value_t v) {
+    nami_printf_value(v);
     printf("\n");
     fflush(stdout);
 }

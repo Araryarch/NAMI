@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -12,11 +12,15 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
 
   describe('Sorting Infrastructure (Task 15.1)', () => {
     it('should define nami_comparator_t function pointer type', () => {
-      expect(runtimeHeader).toContain('typedef int (*nami_comparator_t)(nami_value_t a, nami_value_t b)');
+      expect(runtimeHeader).toContain(
+        'typedef int (*nami_comparator_t)(nami_value_t a, nami_value_t b)'
+      );
     });
 
     it('should implement default comparator for numeric comparison', () => {
-      expect(runtimeHeader).toContain('int nami_default_comparator(nami_value_t a, nami_value_t b)');
+      expect(runtimeHeader).toContain(
+        'int nami_default_comparator(nami_value_t a, nami_value_t b)'
+      );
       const comparatorFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('int nami_default_comparator'),
         runtimeHeader.indexOf('void nami_swap')
@@ -42,7 +46,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
 
   describe('Quicksort Implementation (Task 15.1)', () => {
     it('should implement nami_quicksort with custom comparator support', () => {
-      expect(runtimeHeader).toContain('void nami_quicksort(nami_array_t* arr, nami_comparator_t comparator)');
+      expect(runtimeHeader).toContain(
+        'void nami_quicksort(nami_array_t* arr, nami_comparator_t comparator)'
+      );
     });
 
     it('should handle null array in nami_quicksort', () => {
@@ -62,7 +68,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
     });
 
     it('should implement partition function for quicksort', () => {
-      expect(runtimeHeader).toContain('int64_t nami_partition(nami_array_t* arr, int64_t low, int64_t high, nami_comparator_t cmp)');
+      expect(runtimeHeader).toContain(
+        'int64_t nami_partition(nami_array_t* arr, int64_t low, int64_t high, nami_comparator_t cmp)'
+      );
       const partitionFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('int64_t nami_partition'),
         runtimeHeader.indexOf('void nami_quicksort_helper')
@@ -73,7 +81,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
     });
 
     it('should implement recursive quicksort helper', () => {
-      expect(runtimeHeader).toContain('void nami_quicksort_helper(nami_array_t* arr, int64_t low, int64_t high, nami_comparator_t cmp)');
+      expect(runtimeHeader).toContain(
+        'void nami_quicksort_helper(nami_array_t* arr, int64_t low, int64_t high, nami_comparator_t cmp)'
+      );
       const helperFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_quicksort_helper'),
         runtimeHeader.indexOf('void nami_quicksort(nami_array_t* arr')
@@ -87,7 +97,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
 
   describe('Mergesort Implementation (Task 15.1)', () => {
     it('should implement nami_mergesort with custom comparator support', () => {
-      expect(runtimeHeader).toContain('void nami_mergesort(nami_array_t* arr, nami_comparator_t comparator)');
+      expect(runtimeHeader).toContain(
+        'void nami_mergesort(nami_array_t* arr, nami_comparator_t comparator)'
+      );
     });
 
     it('should handle null array in nami_mergesort', () => {
@@ -107,7 +119,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
     });
 
     it('should implement merge function', () => {
-      expect(runtimeHeader).toContain('void nami_merge(nami_array_t* arr, int64_t left, int64_t mid, int64_t right, nami_comparator_t cmp)');
+      expect(runtimeHeader).toContain(
+        'void nami_merge(nami_array_t* arr, int64_t left, int64_t mid, int64_t right, nami_comparator_t cmp)'
+      );
       const mergeFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_merge('),
         runtimeHeader.indexOf('void nami_mergesort_helper')
@@ -119,7 +133,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
     });
 
     it('should implement recursive mergesort helper', () => {
-      expect(runtimeHeader).toContain('void nami_mergesort_helper(nami_array_t* arr, int64_t left, int64_t right, nami_comparator_t cmp)');
+      expect(runtimeHeader).toContain(
+        'void nami_mergesort_helper(nami_array_t* arr, int64_t left, int64_t right, nami_comparator_t cmp)'
+      );
       const helperFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_mergesort_helper'),
         runtimeHeader.indexOf('void nami_mergesort(nami_array_t* arr')
@@ -132,7 +148,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
 
   describe('Heapsort Implementation (Task 15.1)', () => {
     it('should implement nami_heapsort with custom comparator support', () => {
-      expect(runtimeHeader).toContain('void nami_heapsort(nami_array_t* arr, nami_comparator_t comparator)');
+      expect(runtimeHeader).toContain(
+        'void nami_heapsort(nami_array_t* arr, nami_comparator_t comparator)'
+      );
     });
 
     it('should handle null array in nami_heapsort', () => {
@@ -152,7 +170,9 @@ describe('Runtime Library - Sorting Algorithms (Task 15)', () => {
     });
 
     it('should implement heapify function', () => {
-      expect(runtimeHeader).toContain('void nami_heapify(nami_array_t* arr, int64_t n, int64_t i, nami_comparator_t cmp)');
+      expect(runtimeHeader).toContain(
+        'void nami_heapify(nami_array_t* arr, int64_t n, int64_t i, nami_comparator_t cmp)'
+      );
       const heapifyFunc = runtimeHeader.substring(
         runtimeHeader.indexOf('void nami_heapify'),
         runtimeHeader.indexOf('void nami_heapsort(nami_array_t* arr')

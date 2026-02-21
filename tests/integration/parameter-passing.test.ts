@@ -1,7 +1,7 @@
 /**
  * Parameter Passing Integration Tests
  * Requirements: 4.2, 4.3
- * 
+ *
  * These tests verify that:
  * - Primitives are passed by value (modifications don't affect originals)
  * - Complex types are passed by reference (modifications affect originals)
@@ -32,12 +32,14 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // Verify the generated code uses nami_value_t (passed by value)
       expect(generatedCode.sourceFile).toContain('nami_value_t modifyPrimitive(nami_value_t x)');
-      
+
       // Verify parameter passing comment
-      expect(generatedCode.sourceFile).toContain('Parameter passing: primitives by value, complex types by reference');
+      expect(generatedCode.sourceFile).toContain(
+        'Parameter passing: primitives by value, complex types by reference'
+      );
     });
 
     it('should generate correct code for integer parameter modification', () => {
@@ -52,10 +54,10 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // The function should receive nami_value_t by value
       expect(generatedCode.sourceFile).toContain('nami_value_t increment(nami_value_t n)');
-      
+
       // The assignment should work on the local copy
       expect(generatedCode.sourceFile).toContain('n = nami_add(n, nami_value_int(1LL))');
     });
@@ -72,7 +74,7 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       expect(generatedCode.sourceFile).toContain('nami_value_t negate(nami_value_t flag)');
       expect(generatedCode.sourceFile).toContain('flag = nami_not(flag)');
     });
@@ -97,10 +99,10 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // Verify the generated code uses nami_value_t (which contains a pointer for arrays)
       expect(generatedCode.sourceFile).toContain('nami_value_t modifyArray(nami_value_t arr)');
-      
+
       // Verify array push is called (which modifies the array in-place)
       expect(generatedCode.sourceFile).toContain('nami_array_push');
     });
@@ -116,10 +118,12 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // The function should receive nami_value_t by value (but it contains a pointer)
-      expect(generatedCode.sourceFile).toContain('nami_value_t appendToArray(nami_value_t arr, nami_value_t value)');
-      
+      expect(generatedCode.sourceFile).toContain(
+        'nami_value_t appendToArray(nami_value_t arr, nami_value_t value)'
+      );
+
       // Array operations should work on the pointed-to array
       expect(generatedCode.sourceFile).toContain('nami_array_push(arr, value)');
     });
@@ -135,8 +139,10 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
-      expect(generatedCode.sourceFile).toContain('nami_value_t setProperty(nami_value_t obj, nami_value_t key, nami_value_t value)');
+
+      expect(generatedCode.sourceFile).toContain(
+        'nami_value_t setProperty(nami_value_t obj, nami_value_t key, nami_value_t value)'
+      );
     });
 
     it('should handle string parameters correctly', () => {
@@ -150,7 +156,7 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // Strings are immutable in JavaScript/NAMI, but they're still passed as pointers
       expect(generatedCode.sourceFile).toContain('nami_value_t processString(nami_value_t str)');
     });
@@ -172,12 +178,12 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // All parameters should use nami_value_t
       expect(generatedCode.sourceFile).toContain(
         'nami_value_t mixedParams(nami_value_t num, nami_value_t arr, nami_value_t flag, nami_value_t obj)'
       );
-      
+
       // Verify operations
       expect(generatedCode.sourceFile).toContain('nami_add');
       expect(generatedCode.sourceFile).toContain('nami_array_push');
@@ -198,12 +204,14 @@ describe('Parameter Passing Integration Tests', () => {
       const program = parser.parse();
       const generator = new CodeGenerator();
       const generatedCode = generator.generate(program);
-      
+
       // The nami_value_t struct is passed by value
       // - For primitives: the value is copied (pass-by-value semantics)
       // - For complex types: the pointer is copied, but points to same data (pass-by-reference semantics)
-      expect(generatedCode.sourceFile).toContain('nami_value_t test(nami_value_t x, nami_value_t arr)');
-      
+      expect(generatedCode.sourceFile).toContain(
+        'nami_value_t test(nami_value_t x, nami_value_t arr)'
+      );
+
       // This is the correct implementation because:
       // 1. nami_value_t is a struct containing a union
       // 2. Primitives (int64_t, double, bool) are stored directly in the union

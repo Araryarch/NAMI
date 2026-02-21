@@ -1,0 +1,5 @@
+// Test input function
+print("What is your name? ");
+let name = input();
+println("Hello!");
+println(name);

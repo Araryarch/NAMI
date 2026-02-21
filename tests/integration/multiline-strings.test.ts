@@ -28,7 +28,7 @@ for multi-line strings';
     expect(errors.length).toBe(0);
 
     // Find the string tokens
-    const stringTokens = tokens.filter(t => t.type === TokenType.STRING);
+    const stringTokens = tokens.filter((t) => t.type === TokenType.STRING);
     expect(stringTokens.length).toBe(3);
 
     // First string: multi-line with actual newlines
@@ -37,9 +37,7 @@ for multi-line strings';
     );
 
     // Second string: single quotes multi-line
-    expect(stringTokens[1].literal).toBe(
-      'Single quotes\nalso work\nfor multi-line strings'
-    );
+    expect(stringTokens[1].literal).toBe('Single quotes\nalso work\nfor multi-line strings');
 
     // Third string: escape sequences
     expect(stringTokens[2].literal).toBe('Line 1\nLine 2\tTabbed\nLine 3');
@@ -59,7 +57,7 @@ and more content";
 
     expect(errors.length).toBe(0);
 
-    const stringTokens = tokens.filter(t => t.type === TokenType.STRING);
+    const stringTokens = tokens.filter((t) => t.type === TokenType.STRING);
     expect(stringTokens.length).toBe(3);
 
     expect(stringTokens[0].literal).toBe('He said, "Hello!"');
@@ -88,10 +86,11 @@ unicode: \\u0041\\u0042\\u0043";
 
     expect(errors.length).toBe(0);
 
-    const stringTokens = tokens.filter(t => t.type === TokenType.STRING);
+    const stringTokens = tokens.filter((t) => t.type === TokenType.STRING);
     expect(stringTokens.length).toBe(1);
 
-    const expected = 'newline: \n\ntab: \t\ncarriage return: \r\nbackslash: \\\n' +
+    const expected =
+      'newline: \n\ntab: \t\ncarriage return: \r\nbackslash: \\\n' +
       'single quote: \'\ndouble quote: "\nnull: \0\nbackspace: \b\n' +
       'form feed: \f\nvertical tab: \v\nunicode: ABC';
 
@@ -108,7 +107,7 @@ let y = 42;`;
     const tokens = lexer.tokenize();
 
     // Find the 'y' identifier - it should be on line 4
-    const yToken = tokens.find(t => t.type === TokenType.IDENTIFIER && t.lexeme === 'y');
+    const yToken = tokens.find((t) => t.type === TokenType.IDENTIFIER && t.lexeme === 'y');
     expect(yToken).toBeDefined();
     expect(yToken!.line).toBe(4);
   });

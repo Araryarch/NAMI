@@ -12,7 +12,6 @@ import {
   CallExpression,
   Identifier,
   BlockStatement,
-  ReturnStatement,
 } from '../parser/ast';
 
 export interface InliningStats {
@@ -379,13 +378,13 @@ export class FunctionInliner {
     const substitutions = new Map<string, Expression>();
     for (let i = 0; i < func.params.length; i++) {
       const param = func.params[i];
-      const arg = args[i] || { type: 'Identifier', name: 'undefined' } as Identifier;
+      const arg = args[i] || ({ type: 'Identifier', name: 'undefined' } as Identifier);
       substitutions.set(param.name, arg);
     }
 
     // If function has a single return statement, inline it directly
     if (func.body.body.length === 1 && func.body.body[0].type === 'ReturnStatement') {
-      const returnStmt = func.body.body[0] as ReturnStatement;
+      const returnStmt = func.body.body[0];
       if (returnStmt.argument) {
         return this.substituteParameters(returnStmt.argument, substitutions);
       }

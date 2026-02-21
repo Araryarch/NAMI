@@ -39,10 +39,10 @@ describe('Nami Developer Tooling Setup', () => {
         ...DEFAULT_CONFIG,
         formatting: {
           ...DEFAULT_CONFIG.formatting,
-          indentSize: 0 // Invalid: must be >= 1
-        }
+          indentSize: 0, // Invalid: must be >= 1
+        },
       };
-      
+
       const errors = validateConfig(invalidConfig);
       expect(errors.length).toBeGreaterThan(0);
       expect(errors[0]).toContain('indentSize must be between 1 and 8');
@@ -59,9 +59,9 @@ describe('Nami Developer Tooling Setup', () => {
     it('should generate valid Nami source code', () => {
       const sourceGen = generators.namiSource();
       const sample = fc.sample(sourceGen, 10);
-      
+
       expect(sample).toHaveLength(10);
-      sample.forEach(source => {
+      sample.forEach((source) => {
         expect(typeof source).toBe('string');
         expect(source.length).toBeGreaterThan(0);
       });
@@ -70,8 +70,8 @@ describe('Nami Developer Tooling Setup', () => {
     it('should generate valid positions', () => {
       const posGen = generators.position();
       const sample = fc.sample(posGen, 10);
-      
-      sample.forEach(pos => {
+
+      sample.forEach((pos) => {
         expect(pos.line).toBeGreaterThanOrEqual(0);
         expect(pos.column).toBeGreaterThanOrEqual(0);
       });
@@ -80,8 +80,8 @@ describe('Nami Developer Tooling Setup', () => {
     it('should generate valid source spans', () => {
       const spanGen = generators.sourceSpan();
       const sample = fc.sample(spanGen, 10);
-      
-      sample.forEach(span => {
+
+      sample.forEach((span) => {
         expect(span.start.line).toBeLessThanOrEqual(span.end.line);
         if (span.start.line === span.end.line) {
           expect(span.start.column).toBeLessThanOrEqual(span.end.column);
@@ -94,7 +94,7 @@ describe('Nami Developer Tooling Setup', () => {
     it('should create source files correctly', () => {
       const content = 'let x = 42;';
       const file = testHelpers.createSourceFile(content);
-      
+
       expect(file.content).toBe(content);
       expect(file.path).toBe('test.nm');
       expect(file.version).toBe(1);
@@ -107,7 +107,7 @@ describe('Nami Developer Tooling Setup', () => {
       const pos = testHelpers.createPosition(5, 10);
       expect(pos.line).toBe(5);
       expect(pos.column).toBe(10);
-      
+
       const span = testHelpers.createSpan(1, 0, 1, 10);
       expect(span.start.line).toBe(1);
       expect(span.start.column).toBe(0);
@@ -125,7 +125,7 @@ describe('Nami Developer Tooling Setup', () => {
       const span1 = testHelpers.createSpan(1, 0, 1, 10);
       const span2 = testHelpers.createSpan(1, 0, 1, 10);
       const span3 = testHelpers.createSpan(1, 0, 1, 11);
-      
+
       expect(testHelpers.spansEqual(span1, span2)).toBe(true);
       expect(testHelpers.spansEqual(span1, span3)).toBe(false);
     });

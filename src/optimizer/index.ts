@@ -3,13 +3,9 @@
  * Exports all optimization components
  */
 
-export { Optimizer, OptimizationLevel, OptimizerOptions, OptimizationStats } from './optimizer';
-export {
-  DeadCodeEliminator,
-  DeadCodeStats,
-} from './dead-code-eliminator';
-export {
-  FunctionInliner,
-  InliningStats,
-  InliningOptions,
-} from './function-inliner';
+export { Optimizer } from './optimizer';
+export type { OptimizationLevel, OptimizerOptions, OptimizationStats } from './optimizer';
+export { DeadCodeEliminator } from './dead-code-eliminator';
+export type { DeadCodeStats } from './dead-code-eliminator';
+export { FunctionInliner } from './function-inliner';
+export type { InliningStats, InliningOptions } from './function-inliner';

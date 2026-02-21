@@ -1,0 +1,13 @@
+// Test parseFloat
+println("Enter a number:");
+let str = input();
+println("You entered:");
+println(str);
+
+let num = parseFloat(str);
+println("Parsed as float:");
+println(num);
+
+let doubled = num * 2;
+println("Doubled:");
+println(doubled);

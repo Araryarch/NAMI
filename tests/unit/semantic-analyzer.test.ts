@@ -16,12 +16,12 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const symbolTable = result.symbolTable;
     const x = symbolTable.resolve('x');
     const y = symbolTable.resolve('y');
-    
+
     expect(x).toBeDefined();
     expect(y).toBeDefined();
     expect(x?.name).toBe('x');
@@ -36,7 +36,7 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('Undefined variable');
     expect(result.errors[0].message).toContain('y');
@@ -51,7 +51,7 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('already declared');
   });
@@ -68,7 +68,7 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -82,7 +82,7 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -95,7 +95,7 @@ describe('Semantic Analyzer - Symbol Table', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('constant');
   });
@@ -112,7 +112,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -126,7 +126,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('break');
   });
@@ -141,7 +141,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -155,7 +155,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('continue');
   });
@@ -170,7 +170,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -183,7 +183,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBeGreaterThan(0);
     expect(result.errors[0].message).toContain('return');
   });
@@ -202,7 +202,7 @@ describe('Semantic Analyzer - Control Flow', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 });
@@ -214,7 +214,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('primitive');
@@ -229,7 +229,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('primitive');
@@ -244,7 +244,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('primitive');
@@ -259,7 +259,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('primitive');
@@ -274,7 +274,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('array');
@@ -286,7 +286,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('object');
@@ -298,7 +298,7 @@ describe('Semantic Analyzer - Type Inference', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
     const x = result.symbolTable.resolve('x');
     expect(x?.type.kind).toBe('function');
@@ -317,7 +317,7 @@ describe('Semantic Analyzer - Scoping', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -331,7 +331,7 @@ describe('Semantic Analyzer - Scoping', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -346,7 +346,7 @@ describe('Semantic Analyzer - Scoping', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -362,7 +362,7 @@ describe('Semantic Analyzer - Scoping', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -378,7 +378,7 @@ describe('Semantic Analyzer - Scoping', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 });
@@ -390,7 +390,7 @@ describe('Semantic Analyzer - Built-in Functions', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -400,7 +400,7 @@ describe('Semantic Analyzer - Built-in Functions', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -410,7 +410,7 @@ describe('Semantic Analyzer - Built-in Functions', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 });
@@ -432,7 +432,7 @@ describe('Semantic Analyzer - Complex Programs', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -450,7 +450,7 @@ describe('Semantic Analyzer - Complex Programs', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 
@@ -468,7 +468,7 @@ describe('Semantic Analyzer - Complex Programs', () => {
     const ast = parser.parse();
     const analyzer = new SemanticAnalyzer();
     const result = analyzer.analyze(ast);
-    
+
     expect(result.errors.length).toBe(0);
   });
 });

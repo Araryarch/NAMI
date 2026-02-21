@@ -81,6 +81,8 @@ export class SymbolTable {
     const builtins: [string, NamiType][] = [
       ['print', Types.function([Types.any()], Types.void())],
       ['println', Types.function([Types.any()], Types.void())],
+      ['printf', Types.function([Types.any()], Types.void())],
+      ['printfln', Types.function([Types.any()], Types.void())],
       ['input', Types.function([], Types.string())],
       ['parseInt', Types.function([Types.string()], Types.int())],
       ['parseFloat', Types.function([Types.string()], Types.float())],

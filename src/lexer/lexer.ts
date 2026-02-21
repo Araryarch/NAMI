@@ -109,7 +109,9 @@ export class Lexer {
     }
 
     // We have more tokens if we haven't reached EOF
-    return this.tokenIndex < this.tokens.length && this.tokens[this.tokenIndex].type !== TokenType.EOF;
+    return (
+      this.tokenIndex < this.tokens.length && this.tokens[this.tokenIndex].type !== TokenType.EOF
+    );
   }
 
   private scanToken(): void {
@@ -357,7 +359,7 @@ export class Lexer {
   private string(quote: string): void {
     let value = '';
     const startLine = this.line;
-    
+
     while (!this.isAtEnd() && this.peek() !== quote) {
       // Allow multi-line strings - track line numbers
       if (this.peek() === '\n') {
@@ -366,7 +368,7 @@ export class Lexer {
         value += this.advance();
         continue;
       }
-      
+
       if (this.peek() === '\\') {
         this.advance(); // consume backslash
         const escaped = this.advance();
