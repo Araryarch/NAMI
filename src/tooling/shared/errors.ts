@@ -10,8 +10,12 @@ import { Position, SourceSpan } from '../../../src/lexer/token';
 export abstract class ToolingError extends Error {
   abstract readonly component: string;
   readonly code?: string;
-  
-  constructor(message: string, code?: string, public readonly cause?: Error) {
+
+  constructor(
+    message: string,
+    code?: string,
+    public readonly cause?: Error
+  ) {
     super(message);
     this.name = this.constructor.name;
     this.code = code;
@@ -23,7 +27,7 @@ export abstract class ToolingError extends Error {
  */
 export class SyntaxError extends ToolingError {
   readonly component = 'syntax';
-  
+
   constructor(
     message: string,
     public readonly location: SourceSpan,
@@ -39,7 +43,7 @@ export class SyntaxError extends ToolingError {
  */
 export class SemanticError extends ToolingError {
   readonly component = 'semantic';
-  
+
   constructor(
     message: string,
     public readonly location: SourceSpan,
@@ -55,7 +59,7 @@ export class SemanticError extends ToolingError {
  */
 export class SystemError extends ToolingError {
   readonly component = 'system';
-  
+
   constructor(
     message: string,
     public readonly operation: string,
@@ -71,7 +75,7 @@ export class SystemError extends ToolingError {
  */
 export class ProtocolError extends ToolingError {
   readonly component = 'protocol';
-  
+
   constructor(
     message: string,
     public readonly requestId?: string,
@@ -112,7 +116,7 @@ export enum DiagnosticSeverity {
   Error = 1,
   Warning = 2,
   Information = 3,
-  Hint = 4
+  Hint = 4,
 }
 
 /**

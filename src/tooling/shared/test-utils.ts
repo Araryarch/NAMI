@@ -13,7 +13,7 @@ import { Position, SourceSpan } from '../../../src/lexer/token';
 export const PBT_CONFIG = {
   numRuns: 100,
   verbose: false,
-  seed: undefined as number | undefined
+  seed: undefined as number | undefined,
 };
 
 /**
@@ -26,29 +26,45 @@ export const generators = {
   namiSource: (): fc.Arbitrary<string> => {
     return fc.oneof(
       // Simple statements
-      fc.record({
-        type: fc.constant('variable'),
-        name: fc.stringOf(fc.char().filter(c => /[a-zA-Z_]/.test(c)), { minLength: 1, maxLength: 10 }),
-        value: fc.oneof(
-          fc.integer().map(n => n.toString()),
-          fc.float().map(n => n.toString()),
-          fc.string().map(s => `"${s.replace(/"/g, '\\"')}"`),
-          fc.boolean().map(b => b.toString())
-        )
-      }).map(({ name, value }) => `let ${name} = ${value};`),
-      
+      fc
+        .record({
+          type: fc.constant('variable'),
+          name: fc.stringOf(
+            fc.char().filter((c) => /[a-zA-Z_]/.test(c)),
+            { minLength: 1, maxLength: 10 }
+          ),
+          value: fc.oneof(
+            fc.integer().map((n) => n.toString()),
+            fc.float().map((n) => n.toString()),
+            fc.string().map((s) => `"${s.replace(/"/g, '\\"')}"`),
+            fc.boolean().map((b) => b.toString())
+          ),
+        })
+        .map(({ name, value }) => `let ${name} = ${value};`),
+
       // Function declarations
-      fc.record({
-        name: fc.stringOf(fc.char().filter(c => /[a-zA-Z_]/.test(c)), { minLength: 1, maxLength: 10 }),
-        params: fc.array(fc.stringOf(fc.char().filter(c => /[a-zA-Z_]/.test(c)), { minLength: 1, maxLength: 8 }), { maxLength: 3 }),
-        body: fc.constant('return 42;')
-      }).map(({ name, params, body }) => `function ${name}(${params.join(', ')}) { ${body} }`),
-      
+      fc
+        .record({
+          name: fc.stringOf(
+            fc.char().filter((c) => /[a-zA-Z_]/.test(c)),
+            { minLength: 1, maxLength: 10 }
+          ),
+          params: fc.array(
+            fc.stringOf(
+              fc.char().filter((c) => /[a-zA-Z_]/.test(c)),
+              { minLength: 1, maxLength: 8 }
+            ),
+            { maxLength: 3 }
+          ),
+          body: fc.constant('return 42;'),
+        })
+        .map(({ name, params, body }) => `function ${name}(${params.join(', ')}) { ${body} }`),
+
       // Comments
-      fc.string().map(s => `// ${s.replace(/\n/g, ' ')}`),
-      
+      fc.string().map((s) => `// ${s.replace(/\n/g, ' ')}`),
+
       // Print statements
-      fc.string().map(s => `println("${s.replace(/"/g, '\\"')}");`)
+      fc.string().map((s) => `println("${s.replace(/"/g, '\\"')}");`)
     );
   },
 
@@ -59,7 +75,7 @@ export const generators = {
     return fc.record({
       line: fc.nat(100),
       column: fc.nat(100),
-      offset: fc.nat(10000)
+      offset: fc.nat(10000),
     });
   },
 
@@ -67,12 +83,15 @@ export const generators = {
    * Generate source spans
    */
   sourceSpan: (): fc.Arbitrary<SourceSpan> => {
-    return fc.record({
-      start: generators.position(),
-      end: generators.position()
-    }).filter(({ start, end }) => 
-      start.line < end.line || (start.line === end.line && start.column <= end.column)
-    );
+    return fc
+      .record({
+        start: generators.position(),
+        end: generators.position(),
+      })
+      .filter(
+        ({ start, end }) =>
+          start.line < end.line || (start.line === end.line && start.column <= end.column)
+      );
   },
 
   /**
@@ -80,10 +99,10 @@ export const generators = {
    */
   toolingToken: (): fc.Arbitrary<ToolingToken> => {
     return fc.record({
-      kind: fc.constantFrom(...Object.values(TokenType).filter(t => typeof t === 'number')),
+      kind: fc.constantFrom(...Object.values(TokenType).filter((t) => typeof t === 'number')),
       text: fc.string({ minLength: 1, maxLength: 20 }),
       position: generators.sourceSpan(),
-      trivia: fc.array(generators.trivia(), { maxLength: 3 })
+      trivia: fc.array(generators.trivia(), { maxLength: 3 }),
     });
   },
 
@@ -94,7 +113,7 @@ export const generators = {
     return fc.record({
       kind: fc.constantFrom(...Object.values(TriviaKind)),
       text: fc.string({ maxLength: 50 }),
-      position: generators.sourceSpan()
+      position: generators.sourceSpan(),
     });
   },
 
@@ -104,7 +123,7 @@ export const generators = {
   textChange: (): fc.Arbitrary<{ range: SourceSpan; text: string }> => {
     return fc.record({
       range: generators.sourceSpan(),
-      text: fc.string({ maxLength: 100 })
+      text: fc.string({ maxLength: 100 }),
     });
   },
 
@@ -119,9 +138,9 @@ export const generators = {
     return fc.record({
       indentSize: fc.integer({ min: 1, max: 8 }),
       useTabs: fc.boolean(),
-      maxLineLength: fc.integer({ min: 40, max: 200 })
+      maxLineLength: fc.integer({ min: 40, max: 200 }),
     });
-  }
+  },
 };
 
 /**
@@ -137,7 +156,7 @@ export const testHelpers = {
     version: 1,
     tokens: [],
     diagnostics: [],
-    symbols: []
+    symbols: [],
   }),
 
   /**
@@ -146,15 +165,20 @@ export const testHelpers = {
   createPosition: (line: number, column: number, offset = 0): Position => ({
     line,
     column,
-    offset
+    offset,
   }),
 
   /**
    * Create a source span from coordinates
    */
-  createSpan: (startLine: number, startCol: number, endLine: number, endCol: number): SourceSpan => ({
+  createSpan: (
+    startLine: number,
+    startCol: number,
+    endLine: number,
+    endCol: number
+  ): SourceSpan => ({
     start: { line: startLine, column: startCol, offset: 0 },
-    end: { line: endLine, column: endCol, offset: 0 }
+    end: { line: endLine, column: endCol, offset: 0 },
   }),
 
   /**
@@ -168,11 +192,13 @@ export const testHelpers = {
    * Check if two source spans are equal
    */
   spansEqual: (a: SourceSpan, b: SourceSpan): boolean => {
-    return a.start.line === b.start.line &&
-           a.start.column === b.start.column &&
-           a.end.line === b.end.line &&
-           a.end.column === b.end.column;
-  }
+    return (
+      a.start.line === b.start.line &&
+      a.start.column === b.start.column &&
+      a.end.line === b.end.line &&
+      a.end.column === b.end.column
+    );
+  },
 };
 
 /**
@@ -185,15 +211,12 @@ export function runPropertyTest<T>(
   options: Partial<typeof PBT_CONFIG> = {}
 ): void {
   const config = { ...PBT_CONFIG, ...options };
-  
+
   test(name, () => {
-    fc.assert(
-      fc.property(arbitrary, predicate),
-      {
-        numRuns: config.numRuns,
-        verbose: config.verbose,
-        seed: config.seed
-      }
-    );
+    fc.assert(fc.property(arbitrary, predicate), {
+      numRuns: config.numRuns,
+      verbose: config.verbose,
+      seed: config.seed,
+    });
   });
 }

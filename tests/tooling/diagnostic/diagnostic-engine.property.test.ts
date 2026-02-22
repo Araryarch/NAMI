@@ -1,10 +1,10 @@
 /**
  * Property-Based Tests for Diagnostic Engine
- * 
+ *
  * Tests correctness properties for diagnostic generation including semantic integration,
  * location precision, severity classification, quick fix applicability, unused variable
  * detection, and unreachable code detection.
- * 
+ *
  * Uses fast-check for property-based testing with minimum 100 iterations per test.
  */
 
@@ -28,9 +28,9 @@ const namiNumber = fc.oneof(
   fc.double({ noNaN: true, noDefaultInfinity: true, min: -1000, max: 1000 })
 );
 
-const namiString = fc.string({ maxLength: 30 }).map(s => 
-  `"${s.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`
-);
+const namiString = fc
+  .string({ maxLength: 30 })
+  .map((s) => `"${s.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`);
 
 const namiLiteral = fc.oneof(
   namiNumber.map(String),
@@ -44,59 +44,63 @@ const namiLiteral = fc.oneof(
 const namiSimpleExpression: fc.Arbitrary<string> = fc.oneof(
   namiIdentifier,
   namiLiteral,
-  fc.tuple(namiIdentifier, fc.constantFrom('+', '-', '*', '/'), namiLiteral)
+  fc
+    .tuple(namiIdentifier, fc.constantFrom('+', '-', '*', '/'), namiLiteral)
     .map(([id, op, lit]) => `${id} ${op} ${lit}`)
 );
 
 // Generate Nami statements
 const namiStatement = fc.oneof(
   // Variable declarations
-  fc.tuple(fc.constantFrom('let', 'const'), namiIdentifier, namiSimpleExpression)
+  fc
+    .tuple(fc.constantFrom('let', 'const'), namiIdentifier, namiSimpleExpression)
     .map(([kw, id, expr]) => `${kw} ${id} = ${expr};`),
-  
+
   // Function calls
-  fc.tuple(fc.constantFrom('print', 'println'), namiSimpleExpression)
+  fc
+    .tuple(fc.constantFrom('print', 'println'), namiSimpleExpression)
     .map(([fn, expr]) => `${fn}(${expr});`),
-  
+
   // Return statements
-  namiSimpleExpression.map(expr => `return ${expr};`)
+  namiSimpleExpression.map((expr) => `return ${expr};`)
 );
 
 // Generate Nami function definitions
-const namiFunctionDef = fc.tuple(
-  namiIdentifier,
-  fc.array(namiIdentifier, { maxLength: 3 }),
-  fc.array(namiStatement, { minLength: 1, maxLength: 5 })
-).map(([name, params, body]) => 
-  `fn ${name}(${params.join(', ')}) {\n  ${body.join('\n  ')}\n}`
-);
+const namiFunctionDef = fc
+  .tuple(
+    namiIdentifier,
+    fc.array(namiIdentifier, { maxLength: 3 }),
+    fc.array(namiStatement, { minLength: 1, maxLength: 5 })
+  )
+  .map(([name, params, body]) => `fn ${name}(${params.join(', ')}) {\n  ${body.join('\n  ')}\n}`);
 
 // Generate valid Nami programs
 const namiValidProgram = fc.oneof(
   namiStatement,
   namiFunctionDef,
-  fc.array(fc.oneof(namiStatement, namiFunctionDef), { minLength: 1, maxLength: 5 })
-    .map(stmts => stmts.join('\n\n'))
+  fc
+    .array(fc.oneof(namiStatement, namiFunctionDef), { minLength: 1, maxLength: 5 })
+    .map((stmts) => stmts.join('\n\n'))
 );
 
 // Generate Nami programs with semantic errors
 const namiProgramWithSemanticError = fc.oneof(
   // Undefined variable
-  fc.tuple(namiIdentifier, namiIdentifier).map(([undefined_var, defined_var]) => 
-    `let ${defined_var} = 1;\nlet x = ${undefined_var};`
-  ),
-  
+  fc
+    .tuple(namiIdentifier, namiIdentifier)
+    .map(([undefined_var, defined_var]) => `let ${defined_var} = 1;\nlet x = ${undefined_var};`),
+
   // Assign to constant
-  fc.tuple(namiIdentifier, namiLiteral).map(([name, value]) => 
-    `const ${name} = ${value};\n${name} = 42;`
-  ),
-  
+  fc
+    .tuple(namiIdentifier, namiLiteral)
+    .map(([name, value]) => `const ${name} = ${value};\n${name} = 42;`),
+
   // Return outside function
   fc.constant('return 42;'),
-  
+
   // Break outside loop
   fc.constant('break;'),
-  
+
   // Continue outside loop
   fc.constant('continue;')
 );
@@ -104,46 +108,36 @@ const namiProgramWithSemanticError = fc.oneof(
 // Generate Nami programs with syntax errors
 const namiProgramWithSyntaxError = fc.oneof(
   // Missing semicolon
-  fc.tuple(namiIdentifier, namiLiteral).map(([id, lit]) => 
-    `let ${id} = ${lit}`
-  ),
-  
+  fc.tuple(namiIdentifier, namiLiteral).map(([id, lit]) => `let ${id} = ${lit}`),
+
   // Unclosed brace
-  fc.tuple(namiIdentifier).map(([name]) => 
-    `fn ${name}() {\n  return 1;`
-  ),
-  
+  fc.tuple(namiIdentifier).map(([name]) => `fn ${name}() {\n  return 1;`),
+
   // Unclosed bracket
   fc.constant('let arr = [1, 2, 3'),
-  
+
   // Unclosed paren
-  fc.tuple(namiIdentifier).map(([name]) => 
-    `${name}(1, 2`
-  )
+  fc.tuple(namiIdentifier).map(([name]) => `${name}(1, 2`)
 );
 
 // Generate programs with unreachable code
 const namiProgramWithUnreachableCode = fc.oneof(
   // Code after return
-  fc.tuple(namiIdentifier, namiStatement).map(([name, stmt]) => 
-    `fn ${name}() {\n  return 1;\n  ${stmt}\n}`
-  ),
-  
+  fc
+    .tuple(namiIdentifier, namiStatement)
+    .map(([name, stmt]) => `fn ${name}() {\n  return 1;\n  ${stmt}\n}`),
+
   // Code after break in loop
-  fc.tuple(namiStatement).map(([stmt]) => 
-    `loop {\n  break;\n  ${stmt}\n}`
-  ),
-  
+  fc.tuple(namiStatement).map(([stmt]) => `loop {\n  break;\n  ${stmt}\n}`),
+
   // Code after continue in loop
-  fc.tuple(namiStatement).map(([stmt]) => 
-    `loop {\n  continue;\n  ${stmt}\n}`
-  )
+  fc.tuple(namiStatement).map(([stmt]) => `loop {\n  continue;\n  ${stmt}\n}`)
 );
 
 /**
  * Property 24: Diagnostic Engine Semantic Integration
  * **Validates: Requirements 5.1**
- * 
+ *
  * For any Nami source file, diagnostics generated by the diagnostic engine should
  * include all errors and warnings identified by the semantic analyzer.
  */
@@ -152,25 +146,23 @@ describe('Property 24: Diagnostic Engine Semantic Integration', () => {
     fc.assert(
       fc.property(namiProgramWithSemanticError, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           // Get diagnostics from diagnostic engine
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // Run semantic analyzer directly
           const parser = new Parser(source);
           const ast = parser.parse();
           const analyzer = new SemanticAnalyzer();
           const { errors: semanticErrors } = analyzer.analyze(ast);
-          
+
           // If semantic analyzer found errors, diagnostic engine should too
           if (semanticErrors.length > 0) {
-            const semanticDiagnostics = diagnostics.filter(
-              d => d.source === 'nami-semantic'
-            );
+            const semanticDiagnostics = diagnostics.filter((d) => d.source === 'nami-semantic');
             return semanticDiagnostics.length > 0;
           }
-          
+
           return true;
         } catch (error) {
           // Errors during analysis are acceptable
@@ -185,21 +177,19 @@ describe('Property 24: Diagnostic Engine Semantic Integration', () => {
     fc.assert(
       fc.property(namiProgramWithSemanticError, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // All semantic errors should have Error severity
-          const semanticDiagnostics = diagnostics.filter(
-            d => d.source === 'nami-semantic'
-          );
-          
+          const semanticDiagnostics = diagnostics.filter((d) => d.source === 'nami-semantic');
+
           for (const diagnostic of semanticDiagnostics) {
             if (diagnostic.severity !== DiagnosticSeverity.Error) {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -213,15 +203,13 @@ describe('Property 24: Diagnostic Engine Semantic Integration', () => {
     fc.assert(
       fc.property(namiValidProgram, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // Valid programs should have no errors (or only warnings)
-          const errors = diagnostics.filter(
-            d => d.severity === DiagnosticSeverity.Error
-          );
-          
+          const errors = diagnostics.filter((d) => d.severity === DiagnosticSeverity.Error);
+
           // If there are errors, they should be from one of the expected sources
           for (const error of errors) {
             const validSources = ['nami-lexer', 'nami-parser', 'nami-semantic', 'nami-diagnostic'];
@@ -229,7 +217,7 @@ describe('Property 24: Diagnostic Engine Semantic Integration', () => {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -243,83 +231,77 @@ describe('Property 24: Diagnostic Engine Semantic Integration', () => {
 /**
  * Property 25: Diagnostic Engine Location Precision
  * **Validates: Requirements 5.2**
- * 
+ *
  * For any error or warning in Nami code, the diagnostic should specify source
  * locations that precisely identify the problematic code element.
  */
 describe('Property 25: Diagnostic Engine Location Precision', () => {
   it('should report valid line and column positions for all diagnostics', () => {
     fc.assert(
-      fc.property(
-        fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError),
-        (source) => {
-          const diagnosticEngine = new DiagnosticEngine();
-          
-          try {
-            const diagnostics = diagnosticEngine.analyze(source);
-            
-            // All diagnostics should have valid positions
-            for (const diagnostic of diagnostics) {
-              const { start, end } = diagnostic.range;
-              
-              // Line and column should be positive
-              if (start.line < 1 || start.column < 1) {
-                return false;
-              }
-              
-              // End should be after or equal to start
-              if (end.line < start.line || 
-                  (end.line === start.line && end.column < start.column)) {
-                return false;
-              }
+      fc.property(fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError), (source) => {
+        const diagnosticEngine = new DiagnosticEngine();
+
+        try {
+          const diagnostics = diagnosticEngine.analyze(source);
+
+          // All diagnostics should have valid positions
+          for (const diagnostic of diagnostics) {
+            const { start, end } = diagnostic.range;
+
+            // Line and column should be positive
+            if (start.line < 1 || start.column < 1) {
+              return false;
             }
-            
-            return true;
-          } catch (error) {
-            return true;
+
+            // End should be after or equal to start
+            if (end.line < start.line || (end.line === start.line && end.column < start.column)) {
+              return false;
+            }
           }
+
+          return true;
+        } catch (error) {
+          return true;
         }
-      ),
+      }),
       { numRuns: 100 }
     );
   });
 
   it('should report positions within source bounds', () => {
     fc.assert(
-      fc.property(
-        fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError),
-        (source) => {
-          const diagnosticEngine = new DiagnosticEngine();
-          
-          try {
-            const diagnostics = diagnosticEngine.analyze(source);
-            const lines = source.split('\n');
-            const lineCount = lines.length;
-            
-            // All diagnostic positions should be within source bounds
-            for (const diagnostic of diagnostics) {
-              const { start, end } = diagnostic.range;
-              
-              // Line numbers should be within source
-              if (start.line > lineCount || end.line > lineCount) {
+      fc.property(fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError), (source) => {
+        const diagnosticEngine = new DiagnosticEngine();
+
+        try {
+          const diagnostics = diagnosticEngine.analyze(source);
+          const lines = source.split('\n');
+          const lineCount = lines.length;
+
+          // All diagnostic positions should be within source bounds
+          for (const diagnostic of diagnostics) {
+            const { start, end } = diagnostic.range;
+
+            // Line numbers should be within source
+            if (start.line > lineCount || end.line > lineCount) {
+              return false;
+            }
+
+            // Column should be within line length (with some tolerance for EOF)
+            if (start.line <= lineCount) {
+              const lineLength = lines[start.line - 1].length;
+              if (start.column > lineLength + 10) {
+                // +10 tolerance for EOF markers
                 return false;
               }
-              
-              // Column should be within line length (with some tolerance for EOF)
-              if (start.line <= lineCount) {
-                const lineLength = lines[start.line - 1].length;
-                if (start.column > lineLength + 10) { // +10 tolerance for EOF markers
-                  return false;
-                }
-              }
             }
-            
-            return true;
-          } catch (error) {
-            return true;
           }
+
+          return true;
+        } catch (error) {
+          return true;
         }
-      ),
+      }),
       { numRuns: 100 }
     );
   });
@@ -330,25 +312,24 @@ describe('Property 25: Diagnostic Engine Location Precision', () => {
         fc.tuple(namiIdentifier, namiIdentifier).map(([undefined_var, defined_var]) => ({
           source: `let ${defined_var} = 1;\nlet x = ${undefined_var};`,
           undefinedVar: undefined_var,
-          line: 2
+          line: 2,
         })),
         ({ source, undefinedVar, line }) => {
           const diagnosticEngine = new DiagnosticEngine();
-          
+
           try {
             const diagnostics = diagnosticEngine.analyze(source);
-            
+
             // Find the undefined variable error
             const undefinedError = diagnostics.find(
-              d => d.message.includes('Undefined variable') && 
-                   d.message.includes(undefinedVar)
+              (d) => d.message.includes('Undefined variable') && d.message.includes(undefinedVar)
             );
-            
+
             if (undefinedError) {
               // Error should be on the correct line
               return undefinedError.range.start.line === line;
             }
-            
+
             return true;
           } catch (error) {
             return true;
@@ -363,7 +344,7 @@ describe('Property 25: Diagnostic Engine Location Precision', () => {
 /**
  * Property 26: Diagnostic Engine Severity Classification
  * **Validates: Requirements 5.3**
- * 
+ *
  * For any issue detected in Nami code, the diagnostic should be classified with
  * appropriate severity (error, warning, information, hint) based on the issue type.
  */
@@ -372,21 +353,21 @@ describe('Property 26: Diagnostic Engine Severity Classification', () => {
     fc.assert(
       fc.property(namiProgramWithSyntaxError, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // All syntax errors should have Error severity
           const syntaxDiagnostics = diagnostics.filter(
-            d => d.source === 'nami-parser' || d.source === 'nami-lexer'
+            (d) => d.source === 'nami-parser' || d.source === 'nami-lexer'
           );
-          
+
           for (const diagnostic of syntaxDiagnostics) {
             if (diagnostic.severity !== DiagnosticSeverity.Error) {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -400,21 +381,19 @@ describe('Property 26: Diagnostic Engine Severity Classification', () => {
     fc.assert(
       fc.property(namiProgramWithSemanticError, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // All semantic errors should have Error severity
-          const semanticDiagnostics = diagnostics.filter(
-            d => d.source === 'nami-semantic'
-          );
-          
+          const semanticDiagnostics = diagnostics.filter((d) => d.source === 'nami-semantic');
+
           for (const diagnostic of semanticDiagnostics) {
             if (diagnostic.severity !== DiagnosticSeverity.Error) {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -428,21 +407,19 @@ describe('Property 26: Diagnostic Engine Severity Classification', () => {
     fc.assert(
       fc.property(namiProgramWithUnreachableCode, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // Unreachable code diagnostics should have Warning severity
-          const unreachableDiagnostics = diagnostics.filter(
-            d => d.code === 'UNREACHABLE_CODE'
-          );
-          
+          const unreachableDiagnostics = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE');
+
           for (const diagnostic of unreachableDiagnostics) {
             if (diagnostic.severity !== DiagnosticSeverity.Warning) {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -463,24 +440,24 @@ describe('Property 26: Diagnostic Engine Severity Classification', () => {
         ),
         (source) => {
           const diagnosticEngine = new DiagnosticEngine();
-          
+
           try {
             const diagnostics = diagnosticEngine.analyze(source);
-            
+
             // All diagnostics should have a valid severity
             for (const diagnostic of diagnostics) {
               const validSeverities = [
                 DiagnosticSeverity.Error,
                 DiagnosticSeverity.Warning,
                 DiagnosticSeverity.Information,
-                DiagnosticSeverity.Hint
+                DiagnosticSeverity.Hint,
               ];
-              
+
               if (!validSeverities.includes(diagnostic.severity)) {
                 return false;
               }
             }
-            
+
             return true;
           } catch (error) {
             return true;
@@ -495,45 +472,39 @@ describe('Property 26: Diagnostic Engine Severity Classification', () => {
 /**
  * Property 27: Diagnostic Engine Quick Fix Applicability
  * **Validates: Requirements 5.4**
- * 
+ *
  * For any diagnostic that has an available quick fix, applying the quick fix
  * should resolve the reported issue without introducing new errors.
  */
 describe('Property 27: Diagnostic Engine Quick Fix Applicability', () => {
   it('should provide applicable quick fixes for diagnostics', () => {
     fc.assert(
-      fc.property(
-        fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError),
-        (source) => {
-          const diagnosticEngine = new DiagnosticEngine();
-          const quickFixProvider = new QuickFixProvider();
-          
-          try {
-            const diagnostics = diagnosticEngine.analyze(source);
-            
-            // Check each diagnostic with quick fixes
-            for (const diagnostic of diagnostics) {
-              if (diagnostic.quickFixes.length > 0) {
-                // Quick fixes should be applicable
-                for (const quickFix of diagnostic.quickFixes) {
-                  const isApplicable = quickFixProvider.isQuickFixApplicable(
-                    quickFix,
-                    source
-                  );
-                  
-                  if (!isApplicable) {
-                    return false;
-                  }
+      fc.property(fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError), (source) => {
+        const diagnosticEngine = new DiagnosticEngine();
+        const quickFixProvider = new QuickFixProvider();
+
+        try {
+          const diagnostics = diagnosticEngine.analyze(source);
+
+          // Check each diagnostic with quick fixes
+          for (const diagnostic of diagnostics) {
+            if (diagnostic.quickFixes.length > 0) {
+              // Quick fixes should be applicable
+              for (const quickFix of diagnostic.quickFixes) {
+                const isApplicable = quickFixProvider.isQuickFixApplicable(quickFix, source);
+
+                if (!isApplicable) {
+                  return false;
                 }
               }
             }
-            
-            return true;
-          } catch (error) {
-            return true;
           }
+
+          return true;
+        } catch (error) {
+          return true;
         }
-      ),
+      }),
       { numRuns: 100 }
     );
   });
@@ -543,37 +514,35 @@ describe('Property 27: Diagnostic Engine Quick Fix Applicability', () => {
       fc.property(namiProgramWithUnreachableCode, (source) => {
         const diagnosticEngine = new DiagnosticEngine();
         const quickFixProvider = new QuickFixProvider();
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // Find unreachable code diagnostic with quick fix
           const unreachableDiagnostic = diagnostics.find(
-            d => d.code === 'UNREACHABLE_CODE' && d.quickFixes.length > 0
+            (d) => d.code === 'UNREACHABLE_CODE' && d.quickFixes.length > 0
           );
-          
+
           if (unreachableDiagnostic && unreachableDiagnostic.quickFixes.length > 0) {
             // Apply the quick fix
             const quickFix = unreachableDiagnostic.quickFixes[0];
             const fixedSource = quickFixProvider.applyQuickFix(source, quickFix);
-            
+
             // Re-analyze the fixed source
             const newDiagnostics = diagnosticEngine.analyze(fixedSource);
-            
+
             // The unreachable code warning should be gone or reduced
             const newUnreachable = newDiagnostics.filter(
-              d => d.code === 'UNREACHABLE_CODE'
+              (d) => d.code === 'UNREACHABLE_CODE'
             ).length;
-            const oldUnreachable = diagnostics.filter(
-              d => d.code === 'UNREACHABLE_CODE'
-            ).length;
-            
+            const oldUnreachable = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE').length;
+
             // Should have fewer or equal unreachable code warnings after fix
             // (Note: removing unreachable code may reveal or hide other errors,
             // but the unreachable warning itself should not increase)
             return newUnreachable <= oldUnreachable;
           }
-          
+
           return true;
         } catch (error) {
           return true;
@@ -585,39 +554,38 @@ describe('Property 27: Diagnostic Engine Quick Fix Applicability', () => {
 
   it('should generate valid quick fix edits', () => {
     fc.assert(
-      fc.property(
-        fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError),
-        (source) => {
-          const diagnosticEngine = new DiagnosticEngine();
-          
-          try {
-            const diagnostics = diagnosticEngine.analyze(source);
-            
-            // Check all quick fixes have valid edit ranges
-            for (const diagnostic of diagnostics) {
-              for (const quickFix of diagnostic.quickFixes) {
-                for (const edit of quickFix.edits) {
-                  const { start, end } = edit.range;
-                  
-                  // Range should be valid
-                  if (start.line < 1 || start.column < 1) {
-                    return false;
-                  }
-                  
-                  if (end.line < start.line || 
-                      (end.line === start.line && end.column < start.column)) {
-                    return false;
-                  }
+      fc.property(fc.oneof(namiProgramWithSemanticError, namiProgramWithSyntaxError), (source) => {
+        const diagnosticEngine = new DiagnosticEngine();
+
+        try {
+          const diagnostics = diagnosticEngine.analyze(source);
+
+          // Check all quick fixes have valid edit ranges
+          for (const diagnostic of diagnostics) {
+            for (const quickFix of diagnostic.quickFixes) {
+              for (const edit of quickFix.edits) {
+                const { start, end } = edit.range;
+
+                // Range should be valid
+                if (start.line < 1 || start.column < 1) {
+                  return false;
+                }
+
+                if (
+                  end.line < start.line ||
+                  (end.line === start.line && end.column < start.column)
+                ) {
+                  return false;
                 }
               }
             }
-            
-            return true;
-          } catch (error) {
-            return true;
           }
+
+          return true;
+        } catch (error) {
+          return true;
         }
-      ),
+      }),
       { numRuns: 100 }
     );
   });
@@ -626,7 +594,7 @@ describe('Property 27: Diagnostic Engine Quick Fix Applicability', () => {
 /**
  * Property 29: Diagnostic Engine Unused Variable Detection
  * **Validates: Requirements 5.6**
- * 
+ *
  * For any Nami code containing variables that are declared but never used,
  * the diagnostic engine should detect and report these as warnings.
  */
@@ -635,20 +603,20 @@ describe('Property 29: Diagnostic Engine Unused Variable Detection', () => {
     fc.assert(
       fc.property(
         fc.tuple(namiIdentifier, namiIdentifier, namiLiteral).map(([_unused, used, value]) => ({
-          source: `let ${_unused} = ${value};\nlet ${used} = 1;\nprint(${used});`
+          source: `let ${_unused} = ${value};\nlet ${used} = 1;\nprint(${used});`,
         })),
         ({ source }) => {
           const diagnosticEngine = new DiagnosticEngine({
-            enableUnusedVariableWarnings: true
+            enableUnusedVariableWarnings: true,
           });
-          
+
           try {
             diagnosticEngine.analyze(source);
-            
+
             // Note: Full unused variable detection requires reference tracking
             // which is not fully implemented yet. This test validates the
             // diagnostic engine structure is in place.
-            
+
             // Should not throw errors
             return true;
           } catch (error) {
@@ -663,17 +631,17 @@ describe('Property 29: Diagnostic Engine Unused Variable Detection', () => {
   it('should not report used variables as unused', () => {
     fc.assert(
       fc.property(
-        fc.tuple(namiIdentifier, namiLiteral).map(([name, value]) => 
-          `let ${name} = ${value};\nprint(${name});`
-        ),
+        fc
+          .tuple(namiIdentifier, namiLiteral)
+          .map(([name, value]) => `let ${name} = ${value};\nprint(${name});`),
         (source) => {
           const diagnosticEngine = new DiagnosticEngine({
-            enableUnusedVariableWarnings: true
+            enableUnusedVariableWarnings: true,
           });
-          
+
           try {
             diagnosticEngine.analyze(source);
-            
+
             // Should not have unused variable warnings for used variables
             // (This is a structural test - full implementation pending)
             return true;
@@ -689,24 +657,22 @@ describe('Property 29: Diagnostic Engine Unused Variable Detection', () => {
   it('should respect enableUnusedVariableWarnings option', () => {
     fc.assert(
       fc.property(
-        fc.tuple(namiIdentifier, namiLiteral).map(([name, value]) => 
-          `let ${name} = ${value};`
-        ),
+        fc.tuple(namiIdentifier, namiLiteral).map(([name, value]) => `let ${name} = ${value};`),
         (source) => {
           // With option disabled
           const engineDisabled = new DiagnosticEngine({
-            enableUnusedVariableWarnings: false
+            enableUnusedVariableWarnings: false,
           });
-          
+
           // With option enabled
           const engineEnabled = new DiagnosticEngine({
-            enableUnusedVariableWarnings: true
+            enableUnusedVariableWarnings: true,
           });
-          
+
           try {
             engineDisabled.analyze(source);
             engineEnabled.analyze(source);
-            
+
             // Both should complete without errors
             return true;
           } catch (error) {
@@ -722,7 +688,7 @@ describe('Property 29: Diagnostic Engine Unused Variable Detection', () => {
 /**
  * Property 30: Diagnostic Engine Unreachable Code Detection
  * **Validates: Requirements 5.7**
- * 
+ *
  * For any Nami code containing unreachable statements, the diagnostic engine
  * should detect and report these as warnings.
  */
@@ -730,32 +696,30 @@ describe('Property 30: Diagnostic Engine Unreachable Code Detection', () => {
   it('should detect unreachable code after return statements', () => {
     fc.assert(
       fc.property(
-        fc.tuple(namiIdentifier, namiStatement).map(([name, stmt]) => 
-          `fn ${name}() {\n  return 1;\n  ${stmt}\n}`
-        ),
+        fc
+          .tuple(namiIdentifier, namiStatement)
+          .map(([name, stmt]) => `fn ${name}() {\n  return 1;\n  ${stmt}\n}`),
         (source) => {
           const diagnosticEngine = new DiagnosticEngine({
-            enableUnreachableCodeWarnings: true
+            enableUnreachableCodeWarnings: true,
           });
-          
+
           try {
             const diagnostics = diagnosticEngine.analyze(source);
-            
+
             // Check if there are any syntax errors that would prevent unreachable code detection
             const hasSyntaxErrors = diagnostics.some(
-              d => d.source === 'nami-lexer' || d.source === 'nami-parser'
+              (d) => d.source === 'nami-lexer' || d.source === 'nami-parser'
             );
-            
+
             // If there are syntax errors, we can't reliably detect unreachable code
             if (hasSyntaxErrors) {
               return true;
             }
-            
+
             // Should detect unreachable code
-            const unreachableDiagnostics = diagnostics.filter(
-              d => d.code === 'UNREACHABLE_CODE'
-            );
-            
+            const unreachableDiagnostics = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE');
+
             return unreachableDiagnostics.length > 0;
           } catch (error) {
             return true;
@@ -769,32 +733,28 @@ describe('Property 30: Diagnostic Engine Unreachable Code Detection', () => {
   it('should detect unreachable code after break statements', () => {
     fc.assert(
       fc.property(
-        fc.tuple(namiStatement).map(([stmt]) => 
-          `loop {\n  break;\n  ${stmt}\n}`
-        ),
+        fc.tuple(namiStatement).map(([stmt]) => `loop {\n  break;\n  ${stmt}\n}`),
         (source) => {
           const diagnosticEngine = new DiagnosticEngine({
-            enableUnreachableCodeWarnings: true
+            enableUnreachableCodeWarnings: true,
           });
-          
+
           try {
             const diagnostics = diagnosticEngine.analyze(source);
-            
+
             // Check if there are any syntax errors that would prevent unreachable code detection
             const hasSyntaxErrors = diagnostics.some(
-              d => d.source === 'nami-lexer' || d.source === 'nami-parser'
+              (d) => d.source === 'nami-lexer' || d.source === 'nami-parser'
             );
-            
+
             // If there are syntax errors, we can't reliably detect unreachable code
             if (hasSyntaxErrors) {
               return true;
             }
-            
+
             // Should detect unreachable code
-            const unreachableDiagnostics = diagnostics.filter(
-              d => d.code === 'UNREACHABLE_CODE'
-            );
-            
+            const unreachableDiagnostics = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE');
+
             return unreachableDiagnostics.length > 0;
           } catch (error) {
             return true;
@@ -808,32 +768,28 @@ describe('Property 30: Diagnostic Engine Unreachable Code Detection', () => {
   it('should detect unreachable code after continue statements', () => {
     fc.assert(
       fc.property(
-        fc.tuple(namiStatement).map(([stmt]) => 
-          `loop {\n  continue;\n  ${stmt}\n}`
-        ),
+        fc.tuple(namiStatement).map(([stmt]) => `loop {\n  continue;\n  ${stmt}\n}`),
         (source) => {
           const diagnosticEngine = new DiagnosticEngine({
-            enableUnreachableCodeWarnings: true
+            enableUnreachableCodeWarnings: true,
           });
-          
+
           try {
             const diagnostics = diagnosticEngine.analyze(source);
-            
+
             // Check if there are any syntax errors that would prevent unreachable code detection
             const hasSyntaxErrors = diagnostics.some(
-              d => d.source === 'nami-lexer' || d.source === 'nami-parser'
+              (d) => d.source === 'nami-lexer' || d.source === 'nami-parser'
             );
-            
+
             // If there are syntax errors, we can't reliably detect unreachable code
             if (hasSyntaxErrors) {
               return true;
             }
-            
+
             // Should detect unreachable code
-            const unreachableDiagnostics = diagnostics.filter(
-              d => d.code === 'UNREACHABLE_CODE'
-            );
-            
+            const unreachableDiagnostics = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE');
+
             return unreachableDiagnostics.length > 0;
           } catch (error) {
             return true;
@@ -849,26 +805,26 @@ describe('Property 30: Diagnostic Engine Unreachable Code Detection', () => {
       fc.property(namiProgramWithUnreachableCode, (source) => {
         // With option disabled
         const engineDisabled = new DiagnosticEngine({
-          enableUnreachableCodeWarnings: false
+          enableUnreachableCodeWarnings: false,
         });
-        
+
         // With option enabled
         const engineEnabled = new DiagnosticEngine({
-          enableUnreachableCodeWarnings: true
+          enableUnreachableCodeWarnings: true,
         });
-        
+
         try {
           const diagnosticsDisabled = engineDisabled.analyze(source);
           const diagnosticsEnabled = engineEnabled.analyze(source);
-          
+
           // Disabled should have fewer or equal unreachable code warnings
           const disabledUnreachable = diagnosticsDisabled.filter(
-            d => d.code === 'UNREACHABLE_CODE'
+            (d) => d.code === 'UNREACHABLE_CODE'
           ).length;
           const enabledUnreachable = diagnosticsEnabled.filter(
-            d => d.code === 'UNREACHABLE_CODE'
+            (d) => d.code === 'UNREACHABLE_CODE'
           ).length;
-          
+
           return disabledUnreachable <= enabledUnreachable;
         } catch (error) {
           return true;
@@ -882,23 +838,21 @@ describe('Property 30: Diagnostic Engine Unreachable Code Detection', () => {
     fc.assert(
       fc.property(namiProgramWithUnreachableCode, (source) => {
         const diagnosticEngine = new DiagnosticEngine({
-          enableUnreachableCodeWarnings: true
+          enableUnreachableCodeWarnings: true,
         });
-        
+
         try {
           const diagnostics = diagnosticEngine.analyze(source);
-          
+
           // Unreachable code diagnostics should have quick fixes
-          const unreachableDiagnostics = diagnostics.filter(
-            d => d.code === 'UNREACHABLE_CODE'
-          );
-          
+          const unreachableDiagnostics = diagnostics.filter((d) => d.code === 'UNREACHABLE_CODE');
+
           for (const diagnostic of unreachableDiagnostics) {
             if (diagnostic.quickFixes.length === 0) {
               return false;
             }
           }
-          
+
           return true;
         } catch (error) {
           return true;

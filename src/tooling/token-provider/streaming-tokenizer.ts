@@ -1,9 +1,9 @@
 /**
  * Streaming Tokenizer for Nami Developer Tooling
- * 
+ *
  * Provides streaming tokenization for large files to improve performance
  * and memory usage by processing tokens in chunks.
- * 
+ *
  * Requirements: 4.6
  */
 
@@ -15,8 +15,8 @@ import { Position } from '../../lexer/token';
  * Streaming tokenization options
  */
 export interface StreamingOptions {
-  chunkSize?: number;        // Size of each chunk in characters
-  maxMemoryTokens?: number;  // Maximum tokens to keep in memory
+  chunkSize?: number; // Size of each chunk in characters
+  maxMemoryTokens?: number; // Maximum tokens to keep in memory
   onTokenChunk?: (tokens: ToolingToken[], chunkIndex: number) => void;
   onProgress?: (progress: number) => void; // Progress callback (0-1)
 }
@@ -33,7 +33,7 @@ export interface TokenChunk {
 
 /**
  * Streaming Tokenizer
- * 
+ *
  * Processes large source files in chunks to maintain memory efficiency
  * while providing the same tokenization results as batch processing.
  */
@@ -44,10 +44,10 @@ export class StreamingTokenizer {
   constructor(tokenProvider: TokenProvider, options: StreamingOptions = {}) {
     this.tokenProvider = tokenProvider;
     this.options = {
-      chunkSize: options.chunkSize || 8192,        // 8KB chunks
+      chunkSize: options.chunkSize || 8192, // 8KB chunks
       maxMemoryTokens: options.maxMemoryTokens || 10000, // 10K tokens max
       onTokenChunk: options.onTokenChunk || (() => {}),
-      onProgress: options.onProgress || (() => {})
+      onProgress: options.onProgress || (() => {}),
     };
   }
 
@@ -70,21 +70,21 @@ export class StreamingTokenizer {
 
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
-        
+
         // Tokenize chunk
         const chunkTokens = await this.tokenizeChunk(chunk, source);
-        
+
         // Add to results
         allTokens.push(...chunkTokens.tokens);
         processedTokens += chunkTokens.tokens.length;
-        
+
         // Call progress callback
         const progress = (i + 1) / chunks.length;
         this.options.onProgress(progress);
-        
+
         // Call chunk callback
         this.options.onTokenChunk(chunkTokens.tokens, i);
-        
+
         // Memory management - if we have too many tokens, we might need to yield
         if (processedTokens > this.options.maxMemoryTokens) {
           await this.yieldToEventLoop();
@@ -105,7 +105,7 @@ export class StreamingTokenizer {
    * Tokenize source using streaming approach with iterator
    * Requirements: 4.6
    */
-  async* tokenizeStreamIterator(source: string): AsyncGenerator<TokenChunk, void, unknown> {
+  async *tokenizeStreamIterator(source: string): AsyncGenerator<TokenChunk, void, unknown> {
     try {
       if (source.length <= this.options.chunkSize) {
         // Small file, yield all tokens at once
@@ -114,7 +114,7 @@ export class StreamingTokenizer {
           tokens,
           startOffset: 0,
           endOffset: source.length,
-          chunkIndex: 0
+          chunkIndex: 0,
         };
         return;
       }
@@ -124,13 +124,13 @@ export class StreamingTokenizer {
       for (let i = 0; i < chunks.length; i++) {
         const chunk = chunks[i];
         const chunkTokens = await this.tokenizeChunk(chunk, source);
-        
+
         // Report progress
         const progress = (i + 1) / chunks.length;
         this.options.onProgress(progress);
-        
+
         yield chunkTokens;
-        
+
         // Yield to event loop periodically
         if (i % 10 === 0) {
           await this.yieldToEventLoop();
@@ -148,43 +148,56 @@ export class StreamingTokenizer {
   /**
    * Create chunks from source text with overlap for proper tokenization
    */
-  private createChunks(source: string): Array<{text: string, textStartOffset: number, startOffset: number, endOffset: number}> {
-    const chunks: Array<{text: string, textStartOffset: number, startOffset: number, endOffset: number}> = [];
+  private createChunks(
+    source: string
+  ): Array<{ text: string; textStartOffset: number; startOffset: number; endOffset: number }> {
+    const chunks: Array<{
+      text: string;
+      textStartOffset: number;
+      startOffset: number;
+      endOffset: number;
+    }> = [];
     const overlapSize = 200; // Large overlap to handle tokens that span chunk boundaries
-    
+
     let offset = 0;
     let chunkIndex = 0;
-    
+
     while (offset < source.length) {
       // For chunks after the first, include overlap but don't go back too far
       const textStart = chunkIndex > 0 ? Math.max(offset - overlapSize, 0) : 0;
       const chunkEnd = Math.min(source.length, offset + this.options.chunkSize);
-      
+
       // Try to break at word boundaries to avoid splitting tokens
       let actualChunkEnd = chunkEnd;
       if (chunkEnd < source.length) {
         // Look for a good break point (whitespace, newline, or punctuation)
         for (let i = chunkEnd; i > chunkEnd - 50 && i > textStart; i--) {
           const char = source[i];
-          if (char === '\n' || char === ' ' || char === '\t' || 
-              char === ';' || char === '{' || char === '}') {
+          if (
+            char === '\n' ||
+            char === ' ' ||
+            char === '\t' ||
+            char === ';' ||
+            char === '{' ||
+            char === '}'
+          ) {
             actualChunkEnd = i + 1;
             break;
           }
         }
       }
-      
+
       chunks.push({
         text: source.substring(textStart, actualChunkEnd),
         textStartOffset: textStart, // Where the extracted text starts in the full source
         startOffset: offset, // Start of the range we want to keep tokens from
-        endOffset: actualChunkEnd // End of the range
+        endOffset: actualChunkEnd, // End of the range
       });
-      
+
       offset = actualChunkEnd;
       chunkIndex++;
     }
-    
+
     return chunks;
   }
 
@@ -192,31 +205,31 @@ export class StreamingTokenizer {
    * Tokenize a single chunk and adjust positions
    */
   private async tokenizeChunk(
-    chunk: {text: string, textStartOffset: number, startOffset: number, endOffset: number}, 
+    chunk: { text: string; textStartOffset: number; startOffset: number; endOffset: number },
     fullSource: string
   ): Promise<TokenChunk> {
     // Tokenize the chunk
     const tokens = this.tokenProvider.tokenize(chunk.text);
-    
+
     // Adjust token positions to be relative to the full source
-    const adjustedTokens = tokens.map(token => ({
+    const adjustedTokens = tokens.map((token) => ({
       ...token,
       position: {
         start: this.adjustPosition(token.position.start, chunk.textStartOffset, fullSource),
-        end: this.adjustPosition(token.position.end, chunk.textStartOffset, fullSource)
+        end: this.adjustPosition(token.position.end, chunk.textStartOffset, fullSource),
       },
-      trivia: token.trivia.map(trivia => ({
+      trivia: token.trivia.map((trivia) => ({
         ...trivia,
         position: {
           start: this.adjustPosition(trivia.position.start, chunk.textStartOffset, fullSource),
-          end: this.adjustPosition(trivia.position.end, chunk.textStartOffset, fullSource)
-        }
-      }))
+          end: this.adjustPosition(trivia.position.end, chunk.textStartOffset, fullSource),
+        },
+      })),
     }));
 
     // Filter out tokens that are in the overlap region
     // Only keep tokens that start within [startOffset, endOffset)
-    const filteredTokens = adjustedTokens.filter(token => {
+    const filteredTokens = adjustedTokens.filter((token) => {
       const tokenOffset = token.position.start.offset;
       return tokenOffset >= chunk.startOffset && tokenOffset < chunk.endOffset;
     });
@@ -225,20 +238,24 @@ export class StreamingTokenizer {
       tokens: filteredTokens,
       startOffset: chunk.startOffset,
       endOffset: chunk.endOffset,
-      chunkIndex: 0 // Will be set by caller
+      chunkIndex: 0, // Will be set by caller
     };
   }
 
   /**
    * Adjust position from chunk-relative to source-relative
    */
-  private adjustPosition(position: Position, chunkStartOffset: number, fullSource: string): Position {
+  private adjustPosition(
+    position: Position,
+    chunkStartOffset: number,
+    fullSource: string
+  ): Position {
     const absoluteOffset = position.offset + chunkStartOffset;
-    
+
     // Calculate line and column in full source
     let line = 1;
     let column = 1;
-    
+
     for (let i = 0; i < absoluteOffset && i < fullSource.length; i++) {
       if (fullSource[i] === '\n') {
         line++;
@@ -247,11 +264,11 @@ export class StreamingTokenizer {
         column++;
       }
     }
-    
+
     return {
       line,
       column,
-      offset: absoluteOffset
+      offset: absoluteOffset,
     };
   }
 
@@ -259,7 +276,7 @@ export class StreamingTokenizer {
    * Yield control to the event loop to prevent blocking
    */
   private async yieldToEventLoop(): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, 0));
+    return new Promise((resolve) => setTimeout(resolve, 0));
   }
 
   /**
@@ -270,24 +287,24 @@ export class StreamingTokenizer {
     try {
       // Get batch tokenization result
       const batchTokens = this.tokenProvider.tokenize(source);
-      
+
       // Get streaming tokenization result
       const streamTokens = await this.tokenizeStream(source);
-      
+
       // Compare results
       if (batchTokens.length !== streamTokens.length) {
         return false;
       }
-      
+
       for (let i = 0; i < batchTokens.length; i++) {
         const batchToken = batchTokens[i];
         const streamToken = streamTokens[i];
-        
+
         if (!this.tokensEqual(batchToken, streamToken)) {
           return false;
         }
       }
-      
+
       return true;
     } catch (error) {
       return false;

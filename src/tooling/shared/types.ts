@@ -30,7 +30,7 @@ export interface Trivia {
 export enum TriviaKind {
   Whitespace = 'whitespace',
   LineComment = 'line-comment',
-  BlockComment = 'block-comment'
+  BlockComment = 'block-comment',
 }
 
 /**
@@ -69,7 +69,7 @@ export enum SymbolKind {
   Array = 17,
   Object = 18,
   Key = 19,
-  Null = 20
+  Null = 20,
 }
 
 /**
@@ -144,7 +144,7 @@ export enum CompletionItemKind {
   Struct = 22,
   Event = 23,
   Operator = 24,
-  TypeParameter = 25
+  TypeParameter = 25,
 }
 
 /**

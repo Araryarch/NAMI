@@ -1,9 +1,9 @@
 /**
  * Incremental Tokenizer for Nami Developer Tooling
- * 
+ *
  * Provides efficient incremental tokenization for real-time editing scenarios.
  * Minimizes re-tokenization by only processing changed regions.
- * 
+ *
  * Requirements: 4.4, 4.5, 4.6
  */
 
@@ -22,7 +22,7 @@ interface TokenizationState {
 
 /**
  * Incremental Tokenizer
- * 
+ *
  * Handles incremental updates to tokenization by tracking changes
  * and only re-tokenizing affected regions.
  */
@@ -35,7 +35,7 @@ export class IncrementalTokenizer {
     this.state = {
       tokens: [],
       sourceText: '',
-      version: 0
+      version: 0,
     };
   }
   /**
@@ -46,7 +46,7 @@ export class IncrementalTokenizer {
     this.state = {
       tokens: tokens,
       sourceText: sourceText,
-      version: 1
+      version: 1,
     };
     return tokens;
   }
@@ -101,7 +101,7 @@ export class IncrementalTokenizer {
     this.state = {
       tokens: [],
       sourceText: '',
-      version: 0
+      version: 0,
     };
   }
 
@@ -111,10 +111,8 @@ export class IncrementalTokenizer {
   private applyTextChange(sourceText: string, change: TextChange): string {
     const startOffset = this.positionToOffset(sourceText, change.range.start);
     const endOffset = this.positionToOffset(sourceText, change.range.end);
-    
-    return sourceText.substring(0, startOffset) + 
-           change.text + 
-           sourceText.substring(endOffset);
+
+    return sourceText.substring(0, startOffset) + change.text + sourceText.substring(endOffset);
   }
 
   /**
@@ -125,9 +123,11 @@ export class IncrementalTokenizer {
     let currentLine = 1;
     let currentColumn = 1;
 
-    while (offset < sourceText.length && 
-           (currentLine < position.line || 
-            (currentLine === position.line && currentColumn < position.column))) {
+    while (
+      offset < sourceText.length &&
+      (currentLine < position.line ||
+        (currentLine === position.line && currentColumn < position.column))
+    ) {
       if (sourceText[offset] === '\n') {
         currentLine++;
         currentColumn = 1;
@@ -143,7 +143,7 @@ export class IncrementalTokenizer {
   /**
    * Determine if incremental tokenization is beneficial
    * Requirements: 4.4
-   * 
+   *
    * NOTE: Currently disabled - always use full tokenization for correctness
    * TODO: Implement proper incremental tokenization with correct position tracking
    */
@@ -161,7 +161,7 @@ export class IncrementalTokenizer {
   //   if (range.start.line === range.end.line) {
   //     return range.end.column - range.start.column;
   //   }
-  //   
+  //
   //   // Multi-line range - approximate size
   //   const lineCount = range.end.line - range.start.line;
   //   return lineCount * 50 + range.end.column - range.start.column; // Assume 50 chars per line
@@ -174,39 +174,39 @@ export class IncrementalTokenizer {
   private incrementalTokenize(newSourceText: string, changes: TextChange[]): ToolingToken[] {
     // Find the range of tokens that need to be re-tokenized
     const affectedRange = this.calculateAffectedRange(changes);
-    
+
     // Expand the affected range to include adjacent tokens that might be impacted
     // This is crucial for insertions that might merge with or split existing tokens
     const expandedRange = this.expandAffectedRange(affectedRange, newSourceText);
-    
+
     // Extract tokens before and after the expanded affected range
-    const tokensBefore = this.state.tokens.filter(token => 
+    const tokensBefore = this.state.tokens.filter((token) =>
       this.isTokenBefore(token, expandedRange.start)
     );
-    
-    const tokensAfter = this.state.tokens.filter(token => 
+
+    const tokensAfter = this.state.tokens.filter((token) =>
       this.isTokenAfter(token, expandedRange.end)
     );
 
     // Re-tokenize the affected region
     const affectedText = this.extractTextRange(newSourceText, expandedRange);
     const newTokens = this.tokenProvider.tokenize(affectedText);
-    
+
     // Adjust positions of new tokens to match their position in the full document
     const adjustedNewTokens = this.adjustTokenPositions(newTokens, expandedRange.start);
-    
+
     // Adjust positions of tokens after the change
     const positionDelta = this.calculatePositionDelta(changes);
     const adjustedTokensAfter = this.adjustTokenPositionsWithDelta(tokensAfter, positionDelta);
 
     // Combine all tokens
     const allTokens = [...tokensBefore, ...adjustedNewTokens, ...adjustedTokensAfter];
-    
+
     // Update state
     this.state = {
       tokens: allTokens,
       sourceText: newSourceText,
-      version: this.state.version + 1
+      version: this.state.version + 1,
     };
 
     return allTokens;
@@ -218,11 +218,11 @@ export class IncrementalTokenizer {
    */
   private fullTokenize(newSourceText: string): ToolingToken[] {
     const tokens = this.tokenProvider.tokenize(newSourceText);
-    
+
     this.state = {
       tokens: tokens,
       sourceText: newSourceText,
-      version: this.state.version + 1
+      version: this.state.version + 1,
     };
 
     return tokens;
@@ -254,37 +254,61 @@ export class IncrementalTokenizer {
   private expandAffectedRange(range: SourceSpan, newSourceText: string): SourceSpan {
     const startOffset = this.positionToOffset(newSourceText, range.start);
     const endOffset = this.positionToOffset(newSourceText, range.end);
-    
+
     // Find the start of the token containing or immediately before the start position
     let expandedStartOffset = startOffset;
     while (expandedStartOffset > 0) {
       const char = newSourceText[expandedStartOffset - 1];
       // Stop at whitespace, newline, or punctuation that typically separates tokens
-      if (char === ' ' || char === '\t' || char === '\n' || char === '\r' ||
-          char === ';' || char === '{' || char === '}' || char === '(' || char === ')' ||
-          char === '[' || char === ']' || char === ',' || char === ':') {
+      if (
+        char === ' ' ||
+        char === '\t' ||
+        char === '\n' ||
+        char === '\r' ||
+        char === ';' ||
+        char === '{' ||
+        char === '}' ||
+        char === '(' ||
+        char === ')' ||
+        char === '[' ||
+        char === ']' ||
+        char === ',' ||
+        char === ':'
+      ) {
         break;
       }
       expandedStartOffset--;
     }
-    
+
     // Find the end of the token containing or immediately after the end position
     let expandedEndOffset = endOffset;
     while (expandedEndOffset < newSourceText.length) {
       const char = newSourceText[expandedEndOffset];
       // Stop at whitespace, newline, or punctuation that typically separates tokens
-      if (char === ' ' || char === '\t' || char === '\n' || char === '\r' ||
-          char === ';' || char === '{' || char === '}' || char === '(' || char === ')' ||
-          char === '[' || char === ']' || char === ',' || char === ':') {
+      if (
+        char === ' ' ||
+        char === '\t' ||
+        char === '\n' ||
+        char === '\r' ||
+        char === ';' ||
+        char === '{' ||
+        char === '}' ||
+        char === '(' ||
+        char === ')' ||
+        char === '[' ||
+        char === ']' ||
+        char === ',' ||
+        char === ':'
+      ) {
         break;
       }
       expandedEndOffset++;
     }
-    
+
     // Convert offsets back to positions
     const expandedStart = this.offsetToPosition(newSourceText, expandedStartOffset);
     const expandedEnd = this.offsetToPosition(newSourceText, expandedEndOffset);
-    
+
     return { start: expandedStart, end: expandedEnd };
   }
 
@@ -294,7 +318,7 @@ export class IncrementalTokenizer {
   private offsetToPosition(sourceText: string, offset: number): Position {
     let line = 1;
     let column = 1;
-    
+
     for (let i = 0; i < offset && i < sourceText.length; i++) {
       if (sourceText[i] === '\n') {
         line++;
@@ -303,7 +327,7 @@ export class IncrementalTokenizer {
         column++;
       }
     }
-    
+
     return { line, column, offset };
   }
 
@@ -319,9 +343,11 @@ export class IncrementalTokenizer {
    * Tokens starting at or after the position are considered "after"
    */
   private isTokenAfter(token: ToolingToken, position: Position): boolean {
-    return this.isPositionAfter(token.position.start, position) ||
-           (token.position.start.line === position.line && 
-            token.position.start.column === position.column);
+    return (
+      this.isPositionAfter(token.position.start, position) ||
+      (token.position.start.line === position.line &&
+        token.position.start.column === position.column)
+    );
   }
 
   /**
@@ -354,56 +380,64 @@ export class IncrementalTokenizer {
   private adjustTokenPositions(tokens: ToolingToken[], basePosition: Position): ToolingToken[] {
     // Calculate the offset adjustment
     const baseOffset = basePosition.offset;
-    
-    return tokens.map(token => {
+
+    return tokens.map((token) => {
       // Adjust token position
       const adjustedToken = {
         ...token,
         position: {
           start: {
-            line: token.position.start.line === 1 
-              ? basePosition.line 
-              : basePosition.line + token.position.start.line - 1,
-            column: token.position.start.line === 1
-              ? basePosition.column + token.position.start.column - 1
-              : token.position.start.column,
-            offset: baseOffset + token.position.start.offset
+            line:
+              token.position.start.line === 1
+                ? basePosition.line
+                : basePosition.line + token.position.start.line - 1,
+            column:
+              token.position.start.line === 1
+                ? basePosition.column + token.position.start.column - 1
+                : token.position.start.column,
+            offset: baseOffset + token.position.start.offset,
           },
           end: {
-            line: token.position.end.line === 1
-              ? basePosition.line
-              : basePosition.line + token.position.end.line - 1,
-            column: token.position.end.line === 1
-              ? basePosition.column + token.position.end.column - 1
-              : token.position.end.column,
-            offset: baseOffset + token.position.end.offset
-          }
+            line:
+              token.position.end.line === 1
+                ? basePosition.line
+                : basePosition.line + token.position.end.line - 1,
+            column:
+              token.position.end.line === 1
+                ? basePosition.column + token.position.end.column - 1
+                : token.position.end.column,
+            offset: baseOffset + token.position.end.offset,
+          },
         },
-        trivia: token.trivia.map(trivia => ({
+        trivia: token.trivia.map((trivia) => ({
           ...trivia,
           position: {
             start: {
-              line: trivia.position.start.line === 1
-                ? basePosition.line
-                : basePosition.line + trivia.position.start.line - 1,
-              column: trivia.position.start.line === 1
-                ? basePosition.column + trivia.position.start.column - 1
-                : trivia.position.start.column,
-              offset: baseOffset + trivia.position.start.offset
+              line:
+                trivia.position.start.line === 1
+                  ? basePosition.line
+                  : basePosition.line + trivia.position.start.line - 1,
+              column:
+                trivia.position.start.line === 1
+                  ? basePosition.column + trivia.position.start.column - 1
+                  : trivia.position.start.column,
+              offset: baseOffset + trivia.position.start.offset,
             },
             end: {
-              line: trivia.position.end.line === 1
-                ? basePosition.line
-                : basePosition.line + trivia.position.end.line - 1,
-              column: trivia.position.end.line === 1
-                ? basePosition.column + trivia.position.end.column - 1
-                : trivia.position.end.column,
-              offset: baseOffset + trivia.position.end.offset
-            }
-          }
-        }))
+              line:
+                trivia.position.end.line === 1
+                  ? basePosition.line
+                  : basePosition.line + trivia.position.end.line - 1,
+              column:
+                trivia.position.end.line === 1
+                  ? basePosition.column + trivia.position.end.column - 1
+                  : trivia.position.end.column,
+              offset: baseOffset + trivia.position.end.offset,
+            },
+          },
+        })),
       };
-      
+
       return adjustedToken;
     });
   }
@@ -418,9 +452,9 @@ export class IncrementalTokenizer {
     for (const change of changes) {
       const removedLines = change.range.end.line - change.range.start.line;
       const addedLines = (change.text.match(/\n/g) || []).length;
-      
+
       lineDelta += addedLines - removedLines;
-      
+
       // Column delta only matters for single-line changes
       if (removedLines === 0 && addedLines === 0) {
         const removedColumns = change.range.end.column - change.range.start.column;
@@ -438,44 +472,46 @@ export class IncrementalTokenizer {
     if (delta.line === 0 && delta.column === 0) {
       return tokens; // No adjustment needed
     }
-    
-    return tokens.map(token => ({
+
+    return tokens.map((token) => ({
       ...token,
       position: {
         start: {
           line: token.position.start.line + delta.line,
-          column: delta.line === 0 
-            ? token.position.start.column + delta.column 
-            : token.position.start.column,
-          offset: token.position.start.offset + delta.offset
+          column:
+            delta.line === 0
+              ? token.position.start.column + delta.column
+              : token.position.start.column,
+          offset: token.position.start.offset + delta.offset,
         },
         end: {
           line: token.position.end.line + delta.line,
-          column: delta.line === 0
-            ? token.position.end.column + delta.column
-            : token.position.end.column,
-          offset: token.position.end.offset + delta.offset
-        }
+          column:
+            delta.line === 0 ? token.position.end.column + delta.column : token.position.end.column,
+          offset: token.position.end.offset + delta.offset,
+        },
       },
-      trivia: token.trivia.map(trivia => ({
+      trivia: token.trivia.map((trivia) => ({
         ...trivia,
         position: {
           start: {
             line: trivia.position.start.line + delta.line,
-            column: delta.line === 0
-              ? trivia.position.start.column + delta.column
-              : trivia.position.start.column,
-            offset: trivia.position.start.offset + delta.offset
+            column:
+              delta.line === 0
+                ? trivia.position.start.column + delta.column
+                : trivia.position.start.column,
+            offset: trivia.position.start.offset + delta.offset,
           },
           end: {
             line: trivia.position.end.line + delta.line,
-            column: delta.line === 0
-              ? trivia.position.end.column + delta.column
-              : trivia.position.end.column,
-            offset: trivia.position.end.offset + delta.offset
-          }
-        }
-      }))
+            column:
+              delta.line === 0
+                ? trivia.position.end.column + delta.column
+                : trivia.position.end.column,
+            offset: trivia.position.end.offset + delta.offset,
+          },
+        },
+      })),
     }));
   }
 

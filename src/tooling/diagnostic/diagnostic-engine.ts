@@ -1,9 +1,9 @@
 /**
  * Diagnostic Engine for Nami Developer Tooling
- * 
+ *
  * Integrates with the semantic analyzer to provide comprehensive error reporting,
  * warnings, and quick fix suggestions.
- * 
+ *
  * Requirements: 5.1, 5.2, 5.3, 5.4
  */
 
@@ -34,7 +34,7 @@ export interface WorkspaceDiagnostics {
 
 /**
  * Diagnostic Engine
- * 
+ *
  * Provides comprehensive error reporting and code analysis by integrating
  * with the Nami semantic analyzer.
  */
@@ -45,7 +45,7 @@ export class DiagnosticEngine {
     this.options = {
       enableUnusedVariableWarnings: options.enableUnusedVariableWarnings ?? true,
       enableUnreachableCodeWarnings: options.enableUnreachableCodeWarnings ?? true,
-      maxDiagnosticsPerFile: options.maxDiagnosticsPerFile ?? 100
+      maxDiagnosticsPerFile: options.maxDiagnosticsPerFile ?? 100,
     };
   }
 
@@ -70,7 +70,7 @@ export class DiagnosticEngine {
           message: error.message,
           code: 'LEX_ERROR',
           source: 'nami-lexer',
-          quickFixes: []
+          quickFixes: [],
         });
       }
 
@@ -90,7 +90,7 @@ export class DiagnosticEngine {
             message: error.message,
             code: 'PARSE_ERROR',
             source: 'nami-parser',
-            quickFixes: this.generateRecoverySuggestions(error.message)
+            quickFixes: this.generateRecoverySuggestions(error.message),
           });
         }
       } catch (error) {
@@ -102,9 +102,9 @@ export class DiagnosticEngine {
           message: errorMessage,
           code: 'PARSE_ERROR',
           source: 'nami-parser',
-          quickFixes: []
+          quickFixes: [],
         });
-        
+
         // Return early if parsing failed completely
         return this.limitDiagnostics(diagnostics);
       }
@@ -129,7 +129,7 @@ export class DiagnosticEngine {
             message: error.message,
             code: 'SEMANTIC_ERROR',
             source: 'nami-semantic',
-            quickFixes: this.generateSemanticQuickFixes(error)
+            quickFixes: this.generateSemanticQuickFixes(error),
           });
         }
 
@@ -153,7 +153,7 @@ export class DiagnosticEngine {
         message: `Analysis failed: ${errorMessage}`,
         code: 'ANALYSIS_ERROR',
         source: 'nami-diagnostic',
-        quickFixes: []
+        quickFixes: [],
       });
     }
 
@@ -189,10 +189,12 @@ export class DiagnosticEngine {
         const varName = match[1];
         quickFixes.push({
           title: `Declare variable '${varName}'`,
-          edits: [{
-            range: this.createRange(error.line ?? 1, 1, error.line ?? 1, 1),
-            newText: `let ${varName};\n`
-          }]
+          edits: [
+            {
+              range: this.createRange(error.line ?? 1, 1, error.line ?? 1, 1),
+              newText: `let ${varName};\n`,
+            },
+          ],
         });
       }
     }
@@ -204,10 +206,12 @@ export class DiagnosticEngine {
         const varName = match[1];
         quickFixes.push({
           title: `Change '${varName}' to 'let'`,
-          edits: [{
-            range: this.createRange(error.line ?? 1, 1, error.line ?? 1, 6),
-            newText: 'let'
-          }]
+          edits: [
+            {
+              range: this.createRange(error.line ?? 1, 1, error.line ?? 1, 6),
+              newText: 'let',
+            },
+          ],
         });
       }
     }
@@ -230,7 +234,10 @@ export class DiagnosticEngine {
     }
 
     // Missing closing brace/bracket/paren
-    if (message.includes('expected') && (message.includes('}') || message.includes(']') || message.includes(')'))) {
+    if (
+      message.includes('expected') &&
+      (message.includes('}') || message.includes(']') || message.includes(')'))
+    ) {
       // Placeholder for recovery suggestion
     }
 
@@ -243,17 +250,17 @@ export class DiagnosticEngine {
    */
   private detectUnusedVariables(_ast: any, symbolTable: any): Diagnostic[] {
     const diagnostics: Diagnostic[] = [];
-    
+
     // Get all scopes from symbol table
     const scopes = symbolTable.getAllScopes();
-    
+
     for (const scope of scopes) {
       for (const [_name, symbol] of scope.symbols.entries()) {
         // Skip built-in functions and parameters
         if (symbol.kind === 'function' && scope.parent === null) {
           continue; // Skip global functions (likely built-ins)
         }
-        
+
         if (symbol.kind === 'parameter') {
           continue; // Parameters are often intentionally unused
         }
@@ -282,10 +289,10 @@ export class DiagnosticEngine {
     // Walk the AST to find unreachable code after return/break/continue
     const checkStatements = (statements: any[]): void => {
       let foundTerminator = false;
-      
+
       for (let i = 0; i < statements.length; i++) {
         const stmt = statements[i];
-        
+
         if (foundTerminator) {
           // Code after terminator is unreachable
           if (stmt.span) {
@@ -295,25 +302,31 @@ export class DiagnosticEngine {
               message: 'Unreachable code detected',
               code: 'UNREACHABLE_CODE',
               source: 'nami-diagnostic',
-              quickFixes: [{
-                title: 'Remove unreachable code',
-                edits: [{
-                  range: this.spanToRange(stmt.span),
-                  newText: ''
-                }]
-              }]
+              quickFixes: [
+                {
+                  title: 'Remove unreachable code',
+                  edits: [
+                    {
+                      range: this.spanToRange(stmt.span),
+                      newText: '',
+                    },
+                  ],
+                },
+              ],
             });
           }
         }
-        
+
         // Check if this statement is a terminator
-        if (stmt.type === 'ReturnStatement' || 
-            stmt.type === 'BreakStatement' || 
-            stmt.type === 'ContinueStatement' ||
-            stmt.type === 'ThrowStatement') {
+        if (
+          stmt.type === 'ReturnStatement' ||
+          stmt.type === 'BreakStatement' ||
+          stmt.type === 'ContinueStatement' ||
+          stmt.type === 'ThrowStatement'
+        ) {
           foundTerminator = true;
         }
-        
+
         // Recursively check nested blocks
         if (stmt.type === 'BlockStatement' && stmt.body) {
           checkStatements(stmt.body);
@@ -352,7 +365,7 @@ export class DiagnosticEngine {
   private spanToRange(span: SourceSpan): Range {
     return {
       start: span.start,
-      end: span.end
+      end: span.end,
     };
   }
 
@@ -362,7 +375,7 @@ export class DiagnosticEngine {
   private createRange(startLine: number, startCol: number, endLine: number, endCol: number): Range {
     return {
       start: { line: startLine, column: startCol, offset: 0 },
-      end: { line: endLine, column: endCol, offset: 0 }
+      end: { line: endLine, column: endCol, offset: 0 },
     };
   }
 
@@ -373,12 +386,12 @@ export class DiagnosticEngine {
     if (error.line !== undefined && error.column !== undefined) {
       return {
         start: { line: error.line, column: error.column, offset: 0 },
-        end: { line: error.line, column: error.column + 1, offset: 0 }
+        end: { line: error.line, column: error.column + 1, offset: 0 },
       };
     }
     return {
       start: { line: 1, column: 1, offset: 0 },
-      end: { line: 1, column: 1, offset: 0 }
+      end: { line: 1, column: 1, offset: 0 },
     };
   }
 
@@ -397,7 +410,7 @@ export class DiagnosticEngine {
       message: `Too many diagnostics (${diagnostics.length}). Showing first ${this.options.maxDiagnosticsPerFile}.`,
       code: 'TOO_MANY_DIAGNOSTICS',
       source: 'nami-diagnostic',
-      quickFixes: []
+      quickFixes: [],
     });
 
     return limited;

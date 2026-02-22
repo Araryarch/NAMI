@@ -1,6 +1,6 @@
 /**
  * Unit tests for TokenProvider
- * 
+ *
  * Tests the core tokenization functionality including position tracking,
  * trivia preservation, and error recovery.
  */
@@ -65,7 +65,7 @@ describe('TokenProvider', () => {
       const source = 'fn test() {\n  let x = 1;\n}';
       const tokens = tokenProvider.tokenize(source);
 
-      const letToken = tokens.find(t => t.kind === TokenType.LET);
+      const letToken = tokens.find((t) => t.kind === TokenType.LET);
       expect(letToken).toBeDefined();
       expect(letToken!.position.start.line).toBe(2);
       expect(letToken!.position.start.column).toBe(3);
@@ -86,7 +86,7 @@ describe('TokenProvider', () => {
       const source = 'fn   main() {}';
       const tokens = tokenProvider.tokenize(source);
 
-      const mainToken = tokens.find(t => t.text === 'main');
+      const mainToken = tokens.find((t) => t.text === 'main');
       expect(mainToken).toBeDefined();
       expect(mainToken!.trivia).toHaveLength(1);
       expect(mainToken!.trivia[0].kind).toBe(TriviaKind.Whitespace);
@@ -98,14 +98,14 @@ describe('TokenProvider', () => {
       const tokens = tokenProvider.tokenize(source);
 
       // Find token after the comment
-      const printToken = tokens.find(t => t.text === 'print');
+      const printToken = tokens.find((t) => t.text === 'print');
       expect(printToken).toBeDefined();
-      
+
       // Check if comment is preserved in trivia
-      const hasComment = tokens.some(token => 
-        token.trivia.some(trivia => 
-          trivia.kind === TriviaKind.LineComment && 
-          trivia.text.includes('This is a comment')
+      const hasComment = tokens.some((token) =>
+        token.trivia.some(
+          (trivia) =>
+            trivia.kind === TriviaKind.LineComment && trivia.text.includes('This is a comment')
         )
       );
       expect(hasComment).toBe(true);
@@ -115,10 +115,10 @@ describe('TokenProvider', () => {
       const source = 'fn main() { /* Block comment */ print("hello"); }';
       const tokens = tokenProvider.tokenize(source);
 
-      const hasBlockComment = tokens.some(token => 
-        token.trivia.some(trivia => 
-          trivia.kind === TriviaKind.BlockComment && 
-          trivia.text.includes('Block comment')
+      const hasBlockComment = tokens.some((token) =>
+        token.trivia.some(
+          (trivia) =>
+            trivia.kind === TriviaKind.BlockComment && trivia.text.includes('Block comment')
         )
       );
       expect(hasBlockComment).toBe(true);
@@ -134,10 +134,9 @@ describe('TokenProvider', () => {
       }`;
       const tokens = tokenProvider.tokenize(source);
 
-      const hasMultiLineComment = tokens.some(token => 
-        token.trivia.some(trivia => 
-          trivia.kind === TriviaKind.BlockComment && 
-          trivia.text.includes('Multi-line')
+      const hasMultiLineComment = tokens.some((token) =>
+        token.trivia.some(
+          (trivia) => trivia.kind === TriviaKind.BlockComment && trivia.text.includes('Multi-line')
         )
       );
       expect(hasMultiLineComment).toBe(true);
@@ -154,8 +153,8 @@ describe('TokenProvider', () => {
       const rangeTokens = tokenProvider.getTokensInRange(start, end);
 
       expect(rangeTokens.length).toBeGreaterThan(0);
-      expect(rangeTokens.some(t => t.text === 'let')).toBe(true);
-      expect(rangeTokens.some(t => t.text === 'x')).toBe(true);
+      expect(rangeTokens.some((t) => t.text === 'let')).toBe(true);
+      expect(rangeTokens.some((t) => t.text === 'x')).toBe(true);
     });
 
     it('should return empty array for range with no tokens', () => {
@@ -173,7 +172,7 @@ describe('TokenProvider', () => {
   describe('Error Recovery', () => {
     it('should handle syntax errors gracefully', () => {
       const source = 'fn main() { let x = @#$; }'; // Invalid characters
-      
+
       expect(() => {
         const tokens = tokenProvider.tokenize(source);
         expect(tokens.length).toBeGreaterThan(0); // Should still produce some tokens
@@ -185,27 +184,27 @@ describe('TokenProvider', () => {
       const tokens = tokenProvider.tokenize(source);
 
       // Should still find valid tokens after the error
-      expect(tokens.some(t => t.text === 'fn')).toBe(true);
-      expect(tokens.some(t => t.text === 'main')).toBe(true);
-      expect(tokens.some(t => t.text === 'let')).toBe(true);
-      expect(tokens.some(t => t.text === 'x')).toBe(true);
+      expect(tokens.some((t) => t.text === 'fn')).toBe(true);
+      expect(tokens.some((t) => t.text === 'main')).toBe(true);
+      expect(tokens.some((t) => t.text === 'let')).toBe(true);
+      expect(tokens.some((t) => t.text === 'x')).toBe(true);
     });
 
     it('should handle unterminated strings gracefully', () => {
       const source = 'fn main() { print("unterminated string'; // Missing closing quote
-      
+
       expect(() => {
         const tokens = tokenProvider.tokenize(source);
-        expect(tokens.some(t => t.text === 'fn')).toBe(true);
+        expect(tokens.some((t) => t.text === 'fn')).toBe(true);
       }).not.toThrow();
     });
 
     it('should handle unterminated comments gracefully', () => {
       const source = 'fn main() { /* unterminated comment'; // Missing */
-      
+
       expect(() => {
         const tokens = tokenProvider.tokenize(source);
-        expect(tokens.some(t => t.text === 'fn')).toBe(true);
+        expect(tokens.some((t) => t.text === 'fn')).toBe(true);
       }).not.toThrow();
     });
   });
@@ -220,10 +219,10 @@ describe('TokenProvider', () => {
 
     it('should increment version on each tokenization', () => {
       const initialVersion = tokenProvider.getVersion();
-      
+
       tokenProvider.tokenize('fn main() {}');
       expect(tokenProvider.getVersion()).toBe(initialVersion + 1);
-      
+
       tokenProvider.tokenize('fn test() {}');
       expect(tokenProvider.getVersion()).toBe(initialVersion + 2);
     });
@@ -243,32 +242,32 @@ describe('TokenProvider', () => {
       const source = 'fn main() { loop { print("infinite"); break; } }';
       const tokens = tokenProvider.tokenize(source);
 
-      expect(tokens.some(t => t.kind === TokenType.FN)).toBe(true);
-      expect(tokens.some(t => t.kind === TokenType.LOOP)).toBe(true);
-      expect(tokens.some(t => t.kind === TokenType.PRINT)).toBe(true);
-      expect(tokens.some(t => t.kind === TokenType.BREAK)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.FN)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.LOOP)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.PRINT)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.BREAK)).toBe(true);
     });
 
     it('should tokenize Nami range operator', () => {
       const source = 'for i in 1..10 { print(i); }';
       const tokens = tokenProvider.tokenize(source);
 
-      expect(tokens.some(t => t.kind === TokenType.RANGE)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.RANGE)).toBe(true);
     });
 
     it('should tokenize Nami power operator', () => {
       const source = 'let result = 2 ** 3;';
       const tokens = tokenProvider.tokenize(source);
 
-      expect(tokens.some(t => t.kind === TokenType.POWER)).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.POWER)).toBe(true);
     });
 
     it('should distinguish print and println', () => {
       const source = 'print("hello"); println("world");';
       const tokens = tokenProvider.tokenize(source);
 
-      expect(tokens.some(t => t.kind === TokenType.PRINT && t.text === 'print')).toBe(true);
-      expect(tokens.some(t => t.kind === TokenType.PRINTLN && t.text === 'println')).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.PRINT && t.text === 'print')).toBe(true);
+      expect(tokens.some((t) => t.kind === TokenType.PRINTLN && t.text === 'println')).toBe(true);
     });
   });
 
@@ -285,7 +284,7 @@ describe('TokenProvider', () => {
       // Even with errors, should return some tokens
       const tokens = tokenProvider.tokenize('fn main() { @#$ }');
       expect(tokens.length).toBeGreaterThan(0);
-      expect(tokens.some(t => t.text === 'fn')).toBe(true);
+      expect(tokens.some((t) => t.text === 'fn')).toBe(true);
     });
   });
 });

@@ -1,9 +1,9 @@
 /**
  * Token Provider Service for Nami Developer Tooling
- * 
+ *
  * Exposes the existing Nami lexer functionality as a service that can be consumed
  * by other tooling components like the LSP server and syntax highlighter.
- * 
+ *
  * Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6
  */
 
@@ -23,7 +23,7 @@ export class TokenError extends SystemError {
 
 /**
  * Token Provider Service
- * 
+ *
  * Provides enhanced tokenization capabilities with position tracking,
  * trivia preservation, and incremental updates.
  */
@@ -45,22 +45,24 @@ export class TokenProvider {
     try {
       this.sourceText = source;
       this.version++;
-      
+
       // Create new lexer instance with the source
       this.lexer = new Lexer(source);
-      
+
       // Get all tokens from lexer
       const rawTokens = this.lexer.tokenize();
       const errors = this.lexer.getErrors();
-      
+
       // Convert to enhanced tokens with trivia
       this.cachedTokens = this.enhanceTokens(rawTokens, source);
-      
+
       // Handle lexer errors gracefully - continue with partial tokenization
       if (errors.length > 0) {
-        console.warn(`TokenProvider: ${errors.length} lexer errors encountered, continuing with partial tokenization`);
+        console.warn(
+          `TokenProvider: ${errors.length} lexer errors encountered, continuing with partial tokenization`
+        );
       }
-      
+
       return this.cachedTokens;
     } catch (error) {
       throw new TokenError(
@@ -76,16 +78,15 @@ export class TokenProvider {
    * Requirements: 4.2
    */
   getTokensInRange(start: Position, end: Position): ToolingToken[] {
-    return this.cachedTokens.filter(token => {
+    return this.cachedTokens.filter((token) => {
       const tokenStart = token.position.start;
       const tokenEnd = token.position.end;
-      
+
       // Check if token overlaps with the requested range
       return (
-        (tokenStart.line > start.line || 
-         (tokenStart.line === start.line && tokenStart.column >= start.column)) &&
-        (tokenEnd.line < end.line || 
-         (tokenEnd.line === end.line && tokenEnd.column <= end.column))
+        (tokenStart.line > start.line ||
+          (tokenStart.line === start.line && tokenStart.column >= start.column)) &&
+        (tokenEnd.line < end.line || (tokenEnd.line === end.line && tokenEnd.column <= end.column))
       );
     });
   }
@@ -136,7 +137,7 @@ export class TokenProvider {
         pendingTrivia.push({
           kind: TriviaKind.LineComment,
           text: token.lexeme,
-          position: token.span
+          position: token.span,
         });
         sourceIndex = token.offset + token.lexeme.length;
         continue;
@@ -144,7 +145,7 @@ export class TokenProvider {
         pendingTrivia.push({
           kind: TriviaKind.BlockComment,
           text: token.lexeme,
-          position: token.span
+          position: token.span,
         });
         sourceIndex = token.offset + token.lexeme.length;
         continue;
@@ -155,7 +156,7 @@ export class TokenProvider {
         kind: token.type,
         text: token.lexeme,
         position: token.span,
-        trivia: pendingTrivia
+        trivia: pendingTrivia,
       };
 
       enhanced.push(enhancedToken);
@@ -193,7 +194,7 @@ export class TokenProvider {
     if (text.match(/^[\s\r\n\t]+$/)) {
       const startLine = line;
       const startColumn = column;
-      
+
       for (let i = 0; i < text.length; i++) {
         if (text[i] === '\n') {
           line++;
@@ -202,14 +203,14 @@ export class TokenProvider {
           column++;
         }
       }
-      
+
       trivia.push({
         kind: TriviaKind.Whitespace,
         text: text,
         position: {
           start: { line: startLine, column: startColumn, offset: startOffset },
-          end: { line: line, column: column, offset: startOffset + text.length }
-        }
+          end: { line: line, column: column, offset: startOffset + text.length },
+        },
       });
     }
 

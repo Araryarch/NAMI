@@ -1,8 +1,8 @@
 /**
  * Quick Fix Provider for Nami Developer Tooling
- * 
+ *
  * Generates and applies quick fixes for common code issues.
- * 
+ *
  * Requirements: 5.4
  */
 
@@ -10,7 +10,7 @@ import { QuickFix, TextEdit, Diagnostic } from '../shared/errors';
 
 /**
  * Quick Fix Provider
- * 
+ *
  * Provides intelligent quick fix suggestions for diagnostics.
  */
 export class QuickFixProvider {
@@ -39,7 +39,7 @@ export class QuickFixProvider {
    */
   applyQuickFix(source: string, quickFix: QuickFix): string {
     let result = source;
-    
+
     // Apply edits in reverse order to maintain positions
     const sortedEdits = [...quickFix.edits].sort((a, b) => {
       if (a.range.start.line !== b.range.start.line) {
@@ -69,13 +69,15 @@ export class QuickFixProvider {
         const varName = match[1];
         quickFixes.push({
           title: `Declare variable '${varName}'`,
-          edits: [{
-            range: {
-              start: { line: diagnostic.range.start.line, column: 1, offset: 0 },
-              end: { line: diagnostic.range.start.line, column: 1, offset: 0 }
+          edits: [
+            {
+              range: {
+                start: { line: diagnostic.range.start.line, column: 1, offset: 0 },
+                end: { line: diagnostic.range.start.line, column: 1, offset: 0 },
+              },
+              newText: `let ${varName};\n`,
             },
-            newText: `let ${varName};\n`
-          }]
+          ],
         });
       }
     }
@@ -88,7 +90,7 @@ export class QuickFixProvider {
         // Find the const declaration and suggest changing to let
         quickFixes.push({
           title: `Change '${varName}' to use 'let' instead of 'const'`,
-          edits: [] // Would need AST traversal to find exact location
+          edits: [], // Would need AST traversal to find exact location
         });
       }
     }
@@ -107,13 +109,15 @@ export class QuickFixProvider {
     if (message.includes('expected') && message.includes('semicolon')) {
       quickFixes.push({
         title: 'Add semicolon',
-        edits: [{
-          range: {
-            start: diagnostic.range.end,
-            end: diagnostic.range.end
+        edits: [
+          {
+            range: {
+              start: diagnostic.range.end,
+              end: diagnostic.range.end,
+            },
+            newText: ';',
           },
-          newText: ';'
-        }]
+        ],
       });
     }
 
@@ -121,13 +125,15 @@ export class QuickFixProvider {
     if (message.includes('expected') && message.includes('}')) {
       quickFixes.push({
         title: 'Add closing brace',
-        edits: [{
-          range: {
-            start: diagnostic.range.end,
-            end: diagnostic.range.end
+        edits: [
+          {
+            range: {
+              start: diagnostic.range.end,
+              end: diagnostic.range.end,
+            },
+            newText: '\n}',
           },
-          newText: '\n}'
-        }]
+        ],
       });
     }
 
@@ -135,13 +141,15 @@ export class QuickFixProvider {
     if (message.includes('expected') && message.includes(']')) {
       quickFixes.push({
         title: 'Add closing bracket',
-        edits: [{
-          range: {
-            start: diagnostic.range.end,
-            end: diagnostic.range.end
+        edits: [
+          {
+            range: {
+              start: diagnostic.range.end,
+              end: diagnostic.range.end,
+            },
+            newText: ']',
           },
-          newText: ']'
-        }]
+        ],
       });
     }
 
@@ -149,13 +157,15 @@ export class QuickFixProvider {
     if (message.includes('expected') && message.includes(')')) {
       quickFixes.push({
         title: 'Add closing parenthesis',
-        edits: [{
-          range: {
-            start: diagnostic.range.end,
-            end: diagnostic.range.end
+        edits: [
+          {
+            range: {
+              start: diagnostic.range.end,
+              end: diagnostic.range.end,
+            },
+            newText: ')',
           },
-          newText: ')'
-        }]
+        ],
       });
     }
 
@@ -166,13 +176,17 @@ export class QuickFixProvider {
    * Generate quick fixes for unreachable code
    */
   private generateUnreachableCodeQuickFixes(diagnostic: Diagnostic): QuickFix[] {
-    return [{
-      title: 'Remove unreachable code',
-      edits: [{
-        range: diagnostic.range,
-        newText: ''
-      }]
-    }];
+    return [
+      {
+        title: 'Remove unreachable code',
+        edits: [
+          {
+            range: diagnostic.range,
+            newText: '',
+          },
+        ],
+      },
+    ];
   }
 
   /**
@@ -192,20 +206,13 @@ export class QuickFixProvider {
     if (startLine === endLine) {
       // Single line edit
       const line = lines[startLine];
-      lines[startLine] = 
-        line.substring(0, startCol) + 
-        edit.newText + 
-        line.substring(endCol);
+      lines[startLine] = line.substring(0, startCol) + edit.newText + line.substring(endCol);
     } else {
       // Multi-line edit
       const firstLine = lines[startLine].substring(0, startCol);
       const lastLine = endLine < lines.length ? lines[endLine].substring(endCol) : '';
-      
-      lines.splice(
-        startLine,
-        endLine - startLine + 1,
-        firstLine + edit.newText + lastLine
-      );
+
+      lines.splice(startLine, endLine - startLine + 1, firstLine + edit.newText + lastLine);
     }
 
     return lines.join('\n');

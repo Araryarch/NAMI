@@ -183,7 +183,10 @@ function createProgram(): Command {
         const baseName = path.basename(file, path.extname(file));
         const sourceFile = path.join(tmpDir, `${baseName}.c`);
         const headerFile = path.join(tmpDir, 'nami_generated.h');
-        const executableFile = path.join(tmpDir, baseName + (os.platform() === 'win32' ? '.exe' : ''));
+        const executableFile = path.join(
+          tmpDir,
+          baseName + (os.platform() === 'win32' ? '.exe' : '')
+        );
 
         // Write generated C files
         fs.writeFileSync(sourceFile, result.output!.sourceFile);
@@ -379,4 +382,3 @@ function main() {
 }
 
 main();
-

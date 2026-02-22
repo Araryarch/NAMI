@@ -1,9 +1,9 @@
 /**
  * Enhanced CLI Interface for Nami Developer Tooling
- * 
+ *
  * Provides comprehensive command-line tools for compilation, debugging,
  * and code formatting with improved developer experience.
- * 
+ *
  * Requirements: 1.1, 1.2, 1.3, 1.4, 7.4
  */
 
@@ -42,7 +42,7 @@ export class CLIError extends Error {
 
 /**
  * Enhanced CLI for Nami Developer Tooling
- * 
+ *
  * Provides improved command-line interface with better help, debugging options,
  * and development tools.
  */
@@ -60,16 +60,15 @@ export class NamiCLI {
   loadConfigFile(configPath: string): void {
     try {
       if (!fs.existsSync(configPath)) {
-        throw new CLIError(
-          `Configuration file not found: ${configPath}`,
-          'CONFIG_NOT_FOUND',
-          ['Create a nami.config.json file', 'Check the file path']
-        );
+        throw new CLIError(`Configuration file not found: ${configPath}`, 'CONFIG_NOT_FOUND', [
+          'Create a nami.config.json file',
+          'Check the file path',
+        ]);
       }
 
       const configContent = fs.readFileSync(configPath, 'utf-8');
       const fileConfig = JSON.parse(configContent);
-      
+
       // Merge file config with existing config (CLI args take precedence)
       this.config = { ...fileConfig, ...this.config };
     } catch (error) {
@@ -138,15 +137,14 @@ For more information, visit: https://github.com/nami-lang/nami
   checkSyntax(filePath: string): { success: boolean; errors: any[] } {
     try {
       if (!fs.existsSync(filePath)) {
-        throw new CLIError(
-          `File not found: ${filePath}`,
-          'FILE_NOT_FOUND',
-          ['Check the file path', 'Ensure the file exists']
-        );
+        throw new CLIError(`File not found: ${filePath}`, 'FILE_NOT_FOUND', [
+          'Check the file path',
+          'Ensure the file exists',
+        ]);
       }
 
       const source = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Use diagnostic engine for comprehensive checking
       const diagnosticEngine = new DiagnosticEngine();
       const diagnostics = diagnosticEngine.analyze(source, filePath);
@@ -157,8 +155,8 @@ For more information, visit: https://github.com/nami-lang/nami
         console.log(`Diagnostics found: ${diagnostics.length}`);
       }
 
-      const errors = diagnostics.filter(d => d.severity === 1); // Error severity
-      const warnings = diagnostics.filter(d => d.severity === 2); // Warning severity
+      const errors = diagnostics.filter((d) => d.severity === 1); // Error severity
+      const warnings = diagnostics.filter((d) => d.severity === 2); // Warning severity
 
       if (errors.length > 0) {
         console.error(`\n❌ Found ${errors.length} error(s):\n`);
@@ -203,25 +201,23 @@ For more information, visit: https://github.com/nami-lang/nami
   formatFile(filePath: string, options: { inPlace?: boolean } = {}): string {
     try {
       if (!fs.existsSync(filePath)) {
-        throw new CLIError(
-          `File not found: ${filePath}`,
-          'FILE_NOT_FOUND',
-          ['Check the file path', 'Ensure the file exists']
-        );
+        throw new CLIError(`File not found: ${filePath}`, 'FILE_NOT_FOUND', [
+          'Check the file path',
+          'Ensure the file exists',
+        ]);
       }
 
       const source = fs.readFileSync(filePath, 'utf-8');
-      
+
       // Parse the source
       const compiler = new Compiler();
       const { ast, errors } = compiler.parse(source);
 
       if (errors.length > 0) {
-        throw new CLIError(
-          `Cannot format file with syntax errors`,
-          'FORMAT_ERROR',
-          ['Fix syntax errors first', 'Run "nami check" to see errors']
-        );
+        throw new CLIError(`Cannot format file with syntax errors`, 'FORMAT_ERROR', [
+          'Fix syntax errors first',
+          'Run "nami check" to see errors',
+        ]);
       }
 
       // Format using pretty printer
@@ -258,29 +254,28 @@ For more information, visit: https://github.com/nami-lang/nami
    */
   compileVerbose(filePath: string): any {
     if (!fs.existsSync(filePath)) {
-      throw new CLIError(
-        `File not found: ${filePath}`,
-        'FILE_NOT_FOUND',
-        ['Check the file path', 'Ensure the file exists']
-      );
+      throw new CLIError(`File not found: ${filePath}`, 'FILE_NOT_FOUND', [
+        'Check the file path',
+        'Ensure the file exists',
+      ]);
     }
 
     const source = fs.readFileSync(filePath, 'utf-8');
-    
+
     console.log(`\n=== Compilation: ${filePath} ===`);
     console.log(`Source length: ${source.length} characters`);
-    
+
     // Step 1: Tokenization
     console.log(`\n[1/4] Tokenization...`);
     const tokenProvider = new TokenProvider();
     const tokens = tokenProvider.tokenize(source);
     console.log(`  ✓ Generated ${tokens.length} tokens`);
-    
+
     // Step 2: Parsing
     console.log(`\n[2/4] Parsing...`);
     const compiler = new Compiler();
     const { ast, errors: parseErrors } = compiler.parse(source);
-    
+
     if (parseErrors.length > 0) {
       console.error(`  ✗ Parse errors found: ${parseErrors.length}`);
       for (const error of parseErrors) {
@@ -289,13 +284,13 @@ For more information, visit: https://github.com/nami-lang/nami
       throw new CLIError('Compilation failed', 'COMPILE_ERROR');
     }
     console.log(`  ✓ AST generated with ${ast.body.length} statements`);
-    
+
     // Step 3: Semantic Analysis
     console.log(`\n[3/4] Semantic Analysis...`);
     const diagnosticEngine = new DiagnosticEngine();
     const diagnostics = diagnosticEngine.analyze(source, filePath);
-    const errors = diagnostics.filter(d => d.severity === 1);
-    
+    const errors = diagnostics.filter((d) => d.severity === 1);
+
     if (errors.length > 0) {
       console.error(`  ✗ Semantic errors found: ${errors.length}`);
       for (const error of errors) {
@@ -304,22 +299,22 @@ For more information, visit: https://github.com/nami-lang/nami
       throw new CLIError('Compilation failed', 'COMPILE_ERROR');
     }
     console.log(`  ✓ Semantic analysis passed`);
-    
+
     // Step 4: Code Generation
     console.log(`\n[4/4] Code Generation...`);
     const compilerOptions: Partial<CompilerOptions> = {
-      optimization: this.config.optimization || 'debug'
+      optimization: this.config.optimization || 'debug',
     };
     const fullCompiler = new Compiler(compilerOptions);
     const result = fullCompiler.compile(source);
-    
+
     if (!result.success) {
       console.error(`  ✗ Code generation failed`);
       throw new CLIError('Compilation failed', 'COMPILE_ERROR');
     }
     console.log(`  ✓ C code generated`);
     console.log(`\n=== Compilation Successful ===`);
-    
+
     return result;
   }
 
@@ -329,37 +324,36 @@ For more information, visit: https://github.com/nami-lang/nami
    */
   compileDebug(filePath: string): any {
     if (!fs.existsSync(filePath)) {
-      throw new CLIError(
-        `File not found: ${filePath}`,
-        'FILE_NOT_FOUND',
-        ['Check the file path', 'Ensure the file exists']
-      );
+      throw new CLIError(`File not found: ${filePath}`, 'FILE_NOT_FOUND', [
+        'Check the file path',
+        'Ensure the file exists',
+      ]);
     }
 
     const source = fs.readFileSync(filePath, 'utf-8');
-    
+
     console.log(`\n=== Debug Compilation: ${filePath} ===`);
-    
+
     // Show tokens
     console.log(`\n--- TOKENS ---`);
     const tokenProvider = new TokenProvider();
     const tokens = tokenProvider.tokenize(source);
-    
+
     for (let i = 0; i < Math.min(tokens.length, 50); i++) {
       const token = tokens[i];
       const pos = `${token.position.start.line}:${token.position.start.column}`;
       console.log(`  [${i}] ${token.kind.padEnd(15)} "${token.text}" at ${pos}`);
     }
-    
+
     if (tokens.length > 50) {
       console.log(`  ... and ${tokens.length - 50} more tokens`);
     }
-    
+
     // Show AST
     console.log(`\n--- AST ---`);
     const compiler = new Compiler();
     const { ast, errors } = compiler.parse(source);
-    
+
     if (errors.length > 0) {
       console.error(`Parse errors:`);
       for (const error of errors) {
@@ -367,13 +361,13 @@ For more information, visit: https://github.com/nami-lang/nami
       }
       throw new CLIError('Compilation failed', 'COMPILE_ERROR');
     }
-    
+
     console.log(JSON.stringify(ast, null, 2));
-    
+
     // Continue with compilation
     console.log(`\n--- COMPILATION ---`);
     const result = compiler.compile(source);
-    
+
     if (!result.success) {
       console.error(`Compilation failed with ${result.errors.length} error(s)`);
       for (const error of result.errors) {
@@ -381,9 +375,9 @@ For more information, visit: https://github.com/nami-lang/nami
       }
       throw new CLIError('Compilation failed', 'COMPILE_ERROR');
     }
-    
+
     console.log(`✓ Compilation successful`);
-    
+
     return result;
   }
 

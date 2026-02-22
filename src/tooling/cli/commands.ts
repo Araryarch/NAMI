@@ -1,8 +1,8 @@
 /**
  * CLI Command Handlers
- * 
+ *
  * Provides command implementations for the enhanced CLI interface.
- * 
+ *
  * Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7
  */
 
@@ -21,7 +21,7 @@ export interface CommandResult {
 
 /**
  * CLI Commands
- * 
+ *
  * Provides high-level command handlers that integrate with NamiCLI.
  */
 export class CLICommands {
@@ -61,7 +61,7 @@ export class CLICommands {
       return {
         success: result.success,
         message: result.success ? 'Syntax check passed' : 'Syntax check failed',
-        data: result
+        data: result,
       };
     } catch (error) {
       return this.handleError(error);
@@ -75,18 +75,18 @@ export class CLICommands {
   format(filePath: string, options: { inPlace?: boolean; output?: string } = {}): CommandResult {
     try {
       const formatted = this.cli.formatFile(filePath, { inPlace: options.inPlace });
-      
+
       if (options.output && !options.inPlace) {
         fs.writeFileSync(options.output, formatted, 'utf-8');
         console.log(`✓ Formatted output written to ${options.output}`);
       } else if (!options.inPlace) {
         console.log(formatted);
       }
-      
+
       return {
         success: true,
         message: 'Format successful',
-        data: { formatted }
+        data: { formatted },
       };
     } catch (error) {
       return this.handleError(error);
@@ -103,7 +103,7 @@ export class CLICommands {
       return {
         success: true,
         message: 'Compilation successful',
-        data: result
+        data: result,
       };
     } catch (error) {
       return this.handleError(error);
@@ -120,7 +120,7 @@ export class CLICommands {
       return {
         success: true,
         message: 'Debug compilation successful',
-        data: result
+        data: result,
       };
     } catch (error) {
       return this.handleError(error);
@@ -136,7 +136,7 @@ export class CLICommands {
       this.cli.loadConfigFile(configPath);
       return {
         success: true,
-        message: `Configuration loaded from ${configPath}`
+        message: `Configuration loaded from ${configPath}`,
       };
     } catch (error) {
       return this.handleError(error);
@@ -150,32 +150,32 @@ export class CLICommands {
   private handleError(error: unknown): CommandResult {
     if (error instanceof CLIError) {
       console.error(`\n❌ Error: ${error.message}`);
-      
+
       if (error.suggestions.length > 0) {
         console.error(`\nSuggestions:`);
         for (const suggestion of error.suggestions) {
           console.error(`  • ${suggestion}`);
         }
       }
-      
+
       return {
         success: false,
         message: error.message,
-        data: { code: error.code, suggestions: error.suggestions }
+        data: { code: error.code, suggestions: error.suggestions },
       };
     }
-    
+
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`\n❌ Unexpected error: ${errorMessage}`);
     console.error(`\nSuggestions:`);
     console.error(`  • Check the command syntax`);
     console.error(`  • Run "nami --help" for usage information`);
     console.error(`  • Report this issue if it persists`);
-    
+
     return {
       success: false,
       message: errorMessage,
-      data: { suggestions: ['Check command syntax', 'Run "nami --help"'] }
+      data: { suggestions: ['Check command syntax', 'Run "nami --help"'] },
     };
   }
 
@@ -185,15 +185,11 @@ export class CLICommands {
    */
   static validateArgs(args: string[], minArgs: number, command: string): void {
     if (args.length < minArgs) {
-      throw new CLIError(
-        `Insufficient arguments for command "${command}"`,
-        'INVALID_ARGS',
-        [
-          `Expected at least ${minArgs} argument(s)`,
-          `Run "nami --help" for usage information`,
-          `Example: nami ${command} <file>`
-        ]
-      );
+      throw new CLIError(`Insufficient arguments for command "${command}"`, 'INVALID_ARGS', [
+        `Expected at least ${minArgs} argument(s)`,
+        `Run "nami --help" for usage information`,
+        `Example: nami ${command} <file>`,
+      ]);
     }
   }
 
@@ -204,24 +200,17 @@ export class CLICommands {
   static validateFile(filePath: string): void {
     if (!fs.existsSync(filePath)) {
       const dir = path.dirname(filePath);
-      const suggestions = [
-        'Check the file path for typos',
-        'Ensure the file exists'
-      ];
-      
+      const suggestions = ['Check the file path for typos', 'Ensure the file exists'];
+
       // Suggest similar files in the directory
       if (fs.existsSync(dir)) {
-        const files = fs.readdirSync(dir).filter(f => f.endsWith('.nm'));
+        const files = fs.readdirSync(dir).filter((f) => f.endsWith('.nm'));
         if (files.length > 0) {
           suggestions.push(`Did you mean one of: ${files.slice(0, 3).join(', ')}?`);
         }
       }
-      
-      throw new CLIError(
-        `File not found: ${filePath}`,
-        'FILE_NOT_FOUND',
-        suggestions
-      );
+
+      throw new CLIError(`File not found: ${filePath}`, 'FILE_NOT_FOUND', suggestions);
     }
   }
 
@@ -234,16 +223,12 @@ export class CLICommands {
     if (normalized === 'debug' || normalized === 'release' || normalized === 'max') {
       return normalized;
     }
-    
-    throw new CLIError(
-      `Invalid optimization level: ${level}`,
-      'INVALID_OPTIMIZATION',
-      [
-        'Valid levels are: debug, release, max',
-        'Example: --optimization release',
-        'Use "debug" for development, "release" for production'
-      ]
-    );
+
+    throw new CLIError(`Invalid optimization level: ${level}`, 'INVALID_OPTIMIZATION', [
+      'Valid levels are: debug, release, max',
+      'Example: --optimization release',
+      'Use "debug" for development, "release" for production',
+    ]);
   }
 
   /**

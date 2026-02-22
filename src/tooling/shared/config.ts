@@ -63,7 +63,7 @@ export interface CLIConfig {
 export enum TraceLevel {
   Off = 'off',
   Messages = 'messages',
-  Verbose = 'verbose'
+  Verbose = 'verbose',
 }
 
 /**
@@ -74,7 +74,7 @@ export enum DiagnosticSeverityLevel {
   Warning = 'warning',
   Information = 'information',
   Hint = 'hint',
-  Disabled = 'disabled'
+  Disabled = 'disabled',
 }
 
 /**
@@ -85,14 +85,14 @@ export const DEFAULT_CONFIG: ToolingConfig = {
     initializationOptions: {},
     trace: TraceLevel.Off,
     maxDiagnosticsPerFile: 100,
-    completionTriggerCharacters: ['.', '(', '[']
+    completionTriggerCharacters: ['.', '(', '['],
   },
   formatting: {
     indentSize: 2,
     useTabs: false,
     maxLineLength: 100,
     insertFinalNewline: true,
-    trimTrailingWhitespace: true
+    trimTrailingWhitespace: true,
   },
   diagnostics: {
     enableUnusedVariableWarnings: true,
@@ -102,39 +102,35 @@ export const DEFAULT_CONFIG: ToolingConfig = {
       'unused-variable': DiagnosticSeverityLevel.Warning,
       'unreachable-code': DiagnosticSeverityLevel.Warning,
       'syntax-error': DiagnosticSeverityLevel.Error,
-      'semantic-error': DiagnosticSeverityLevel.Error
-    }
+      'semantic-error': DiagnosticSeverityLevel.Error,
+    },
   },
   cli: {
     defaultOptimizationLevel: 0,
     verboseOutput: false,
     debugOutput: false,
-    outputDirectory: './output'
-  }
+    outputDirectory: './output',
+  },
 };
 
 /**
  * Configuration file names to search for
  */
-const CONFIG_FILES = [
-  'nami.config.json',
-  '.namirc.json',
-  '.nami/config.json'
-];
+const CONFIG_FILES = ['nami.config.json', '.namirc.json', '.nami/config.json'];
 
 /**
  * Load configuration from file system
  */
 export function loadConfig(workspaceRoot?: string): ToolingConfig {
   const config = { ...DEFAULT_CONFIG };
-  
+
   // Search for configuration files
   const searchPaths = workspaceRoot ? [workspaceRoot] : [process.cwd()];
-  
+
   for (const searchPath of searchPaths) {
     for (const configFile of CONFIG_FILES) {
       const configPath = join(searchPath, configFile);
-      
+
       if (existsSync(configPath)) {
         try {
           const fileConfig = JSON.parse(readFileSync(configPath, 'utf-8'));
@@ -146,7 +142,7 @@ export function loadConfig(workspaceRoot?: string): ToolingConfig {
       }
     }
   }
-  
+
   return config;
 }
 
@@ -173,25 +169,28 @@ function mergeConfig(target: ToolingConfig, source: Partial<ToolingConfig>): voi
  */
 export function validateConfig(config: ToolingConfig): string[] {
   const errors: string[] = [];
-  
+
   // Validate formatting config
   if (config.formatting.indentSize < 1 || config.formatting.indentSize > 8) {
     errors.push('formatting.indentSize must be between 1 and 8');
   }
-  
+
   if (config.formatting.maxLineLength < 40 || config.formatting.maxLineLength > 200) {
     errors.push('formatting.maxLineLength must be between 40 and 200');
   }
-  
+
   // Validate diagnostics config
-  if (config.diagnostics.maxDiagnosticsPerFile < 1 || config.diagnostics.maxDiagnosticsPerFile > 1000) {
+  if (
+    config.diagnostics.maxDiagnosticsPerFile < 1 ||
+    config.diagnostics.maxDiagnosticsPerFile > 1000
+  ) {
     errors.push('diagnostics.maxDiagnosticsPerFile must be between 1 and 1000');
   }
-  
+
   // Validate CLI config
   if (config.cli.defaultOptimizationLevel < 0 || config.cli.defaultOptimizationLevel > 3) {
     errors.push('cli.defaultOptimizationLevel must be between 0 and 3');
   }
-  
+
   return errors;
 }
