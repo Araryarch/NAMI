@@ -4,6 +4,7 @@
   "description": "Syntax highlighting and language support for NAMI programming language",
   "version": "0.1.0",
   "publisher": "Araryarch",
+  "icon": "images/icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/Araryarch/NAMI"
@@ -31,7 +32,11 @@
         "extensions": [
           ".nm"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/file-icon.svg",
+          "dark": "./images/file-icon.svg"
+        }
       }
     ],
     "grammars": [
@@ -45,13 +50,6 @@
       {
         "language": "nami",
         "path": "./snippets/nami.json"
-      }
-    ],
-    "themes": [
-      {
-        "label": "NAMI Dark",
-        "uiTheme": "vs-dark",
-        "path": "./themes/nami-dark.json"
       }
     ]
   },

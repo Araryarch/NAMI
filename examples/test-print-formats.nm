@@ -1,4 +1,4 @@
-// Test print vs printf formats
+// Test print vs println formats
 
 let arr = [1, 2, 3, 4, 5];
 let obj = {name: "Alice", age: 30};
@@ -10,13 +10,13 @@ println(obj);
 println(str);
 
 println("");
-println("=== Low-level Output (printfln) ===");
-printfln(arr);
-printfln(obj);
-printfln(str);
+println("=== Low-level Output (println with f) ===");
+println(f, arr);
+println(f, obj);
+println(f, str);
 
 println("");
 println("=== Mixed Array ===");
 let mixed = [1, "hello", true, [10, 20]];
 println(mixed);
-printfln(mixed);
+println(f, mixed);

@@ -543,11 +543,30 @@ export class CodeGenerator {
 
   /** Generate print/println: `print("hello")` or `println(x)` */
   private generatePrintStatement(stmt: PrintStatement): void {
-    const args = stmt.arguments.map((a) => this.generateExpression(a)).join(', ');
-    if (stmt.newline) {
-      this.emitLine(`nami_println(${args || 'NAMI_NULL'});`);
+    // Check if first argument is 'f' (format specifier)
+    const firstArg = stmt.arguments[0];
+    const isFormatted =
+      stmt.arguments.length > 0 && firstArg?.type === 'Identifier' && firstArg.name === 'f';
+
+    if (isFormatted) {
+      // Use printf-style formatting (space-separated, no brackets)
+      const args = stmt.arguments
+        .slice(1)
+        .map((a) => this.generateExpression(a))
+        .join(', ');
+      if (stmt.newline) {
+        this.emitLine(`nami_printfln(${args || 'NAMI_NULL'});`);
+      } else {
+        this.emitLine(`nami_printf(${args || 'NAMI_NULL'});`);
+      }
     } else {
-      this.emitLine(`nami_print(${args || 'NAMI_NULL'});`);
+      // Use regular JSON-style formatting
+      const args = stmt.arguments.map((a) => this.generateExpression(a)).join(', ');
+      if (stmt.newline) {
+        this.emitLine(`nami_println(${args || 'NAMI_NULL'});`);
+      } else {
+        this.emitLine(`nami_print(${args || 'NAMI_NULL'});`);
+      }
     }
   }
 

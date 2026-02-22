@@ -151,6 +151,20 @@
     ],
     "description": "Print without newline"
   },
+  "Print with Format": {
+    "prefix": "printf",
+    "body": [
+      "print(f, ${1:value});"
+    ],
+    "description": "Print with C-style format (space-separated)"
+  },
+  "Println with Format": {
+    "prefix": "printlnf",
+    "body": [
+      "println(f, ${1:value});"
+    ],
+    "description": "Print line with C-style format (space-separated)"
+  },
   "Variable Declaration (let)": {
     "prefix": "let",
     "body": [

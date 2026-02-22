@@ -3,7 +3,7 @@
 {"name":"Alice","age":30}
 Hello, World!
 
-=== Low-level Output (printfln) ===
+=== Low-level Output (println with f) ===
 1 2 3 4 5
 name:Alice age:30
 Hello, World!
