@@ -10,7 +10,7 @@ export * from './shared/types';
 export * from './shared/test-utils';
 
 // Export config with explicit naming to avoid conflicts
-export {
+export type {
   ToolingConfig,
   CLIConfig as SharedCLIConfig,
   LSPConfig,
@@ -18,10 +18,9 @@ export {
   FormattingConfig,
   TraceLevel,
   DiagnosticSeverityLevel,
-  DEFAULT_CONFIG,
-  loadConfig,
-  validateConfig,
 } from './shared/config';
+
+export { DEFAULT_CONFIG, loadConfig, validateConfig } from './shared/config';
 
 // Core services (will be implemented in subsequent tasks)
 export * from './token-provider';

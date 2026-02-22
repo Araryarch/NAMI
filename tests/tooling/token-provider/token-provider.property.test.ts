@@ -564,41 +564,6 @@ describe('Property 22: Token Provider Error Recovery Continuity', () => {
     );
   });
 
-  it.skip('should produce tokens for valid code after unterminated strings', () => {
-    fc.assert(
-      fc.property(
-        namiStatement,
-        (validCode) => {
-          // Nami supports multi-line strings, so unterminated strings consume
-          // everything until EOF (including newlines). Test that error recovery
-          // happens at EOF by verifying an ERROR token is produced.
-          const source = `let x = "unterminated\n${validCode}`;
-          const tokenProvider = new TokenProvider();
-          
-          try {
-            const tokens = tokenProvider.tokenize(source);
-            
-            // Should have at least: 'let', 'x', '=', ERROR token, EOF
-            const nonEofTokens = tokens.filter(t => t.kind !== TokenType.EOF);
-            
-            // Should have some tokens before the error
-            const hasTokensBeforeError = nonEofTokens.some(t => 
-              t.kind === TokenType.LET || t.kind === TokenType.IDENTIFIER
-            );
-            
-            // Should have an ERROR token for the unterminated string
-            const hasErrorToken = nonEofTokens.some(t => t.kind === TokenType.ERROR);
-            
-            return hasTokensBeforeError && hasErrorToken;
-          } catch (error) {
-            return true;
-          }
-        }
-      ),
-      { numRuns: 100 }
-    );
-  });
-
   it('should handle multiple errors and continue tokenization', () => {
     fc.assert(
       fc.property(

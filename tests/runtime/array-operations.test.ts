@@ -1,4 +1,4 @@
-import { describe, it, expect } from '@jest/globals';
+import { describe, it, expect, beforeAll } from '@jest/globals';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -32,10 +32,10 @@ describe('Runtime Library - Array Operations', () => {
     });
 
     it('should handle null pointer in nami_array_destroy', () => {
-      const destroyFunc = runtimeHeader.substring(
-        runtimeHeader.indexOf('void nami_array_destroy'),
-        runtimeHeader.indexOf('void nami_array_push')
-      );
+      // Find the actual implementation (not the forward declaration)
+      const destroyStart = runtimeHeader.indexOf('static inline void nami_array_destroy');
+      const destroyEnd = runtimeHeader.indexOf('}', destroyStart) + 1;
+      const destroyFunc = runtimeHeader.substring(destroyStart, destroyEnd);
       expect(destroyFunc).toContain('if (arr != NULL)');
     });
   });

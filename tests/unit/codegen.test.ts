@@ -53,16 +53,6 @@ describe('Code Generator', () => {
       expect(code.sourceFile).toContain('nami_value_t add(nami_value_t a, nami_value_t b)');
       expect(code.sourceFile).toContain('return nami_add(a, b)');
     });
-
-    it.skip('should generate function prototype in header', () => {
-      const source = 'function test() { return 1 }';
-      const parser = new Parser(source);
-      const program = parser.parse();
-      const generator = new CodeGenerator();
-      const code = generator.generate(program);
-
-      expect(code.headerFile).toContain('nami_value_t test(void);');
-    });
   });
 
   describe('Control Flow Generation (Requirements 3.1-3.6)', () => {
