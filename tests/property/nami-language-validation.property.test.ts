@@ -259,7 +259,7 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
         cwd: process.cwd(),
         encoding: 'utf-8',
         stdio: 'pipe',
-        timeout: 10000,
+        timeout: 30000, // Increased to 30s for Windows compatibility
       });
       return {
         exitCode: 0,
@@ -319,7 +319,7 @@ describe('Property 2: Preservation - Existing Functionality Unchanged', () => {
     if (baseline.compile.hasCCompilationError) {
       expect(compileResult.stderr).toContain('C compilation failed');
     }
-  });
+  }, 60000); // 60 second timeout for Windows compatibility
 
   it('should preserve behavior of test-cli.nm', () => {
     const filePath = path.join(examplesDir, 'test-cli.nm');
