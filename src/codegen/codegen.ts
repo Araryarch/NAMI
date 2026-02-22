@@ -114,9 +114,8 @@ export class CodeGenerator {
     }
 
     this.emit('');
-    this.emit('// Lambda functions');
 
-    // Generate body
+    // First collect main statements and lambdas implicitly
     const mainStatements: Statement[] = [];
     for (const stmt of program.body) {
       if (stmt.type === 'FunctionDeclaration') {
@@ -126,7 +125,23 @@ export class CodeGenerator {
       }
     }
 
-    // Append lambdas
+    // Capture main body to trigger lambda generation
+    const savedOutput = this.output;
+    const mainSavedIndent = this.indent;
+    this.output = [];
+    this.indent = hasMainFunc ? this.indent : this.indent + 1;
+
+    for (const stmt of mainStatements) {
+      this.generateStatement(stmt);
+    }
+    const mainBodyOutput = this.output;
+
+    // Restore output
+    this.output = savedOutput;
+    this.indent = mainSavedIndent;
+
+    this.emit('// Lambda functions');
+    // Now push all lambdas
     for (const lambda of this.lambdas) {
       this.output.push(lambda);
     }
@@ -140,9 +155,7 @@ export class CodeGenerator {
       this.emitLine('nami_gc_init(&nami_gc);');
       this.emitLine('');
 
-      for (const stmt of mainStatements) {
-        this.generateStatement(stmt);
-      }
+      this.output.push(...mainBodyOutput);
 
       this.emitLine('');
       this.emitLine('nami_gc_collect(&nami_gc);');
@@ -150,10 +163,8 @@ export class CodeGenerator {
       this.indent--;
       this.emit('}');
     } else {
-      // User has a main function, just emit top-level statements
-      for (const stmt of mainStatements) {
-        this.generateStatement(stmt);
-      }
+      // User has a main function
+      this.output.push(...mainBodyOutput);
     }
 
     // For backward compatibility, still generate header output
@@ -918,12 +929,12 @@ export class CodeGenerator {
       }
 
       // Generic method call
-      return `nami_method_call(${obj}, "${methodName}"${args ? ', ' + args : ''})`;
+      return `nami_invoke_method(${obj}, "${methodName}", ${expr.arguments.length}${args ? ', ' + args : ''})`;
     }
 
     // Computed method call
     const prop = this.generateExpression(member.property);
-    return `nami_dynamic_call(${obj}, ${prop}${args ? ', ' + args : ''})`;
+    return `nami_invoke_method_dynamic(${obj}, ${prop}, ${expr.arguments.length}${args ? ', ' + args : ''})`;
   }
 
   private generateNewExpression(expr: import('../parser/ast').NewExpression): string {
@@ -1029,7 +1040,7 @@ export class CodeGenerator {
     lines.push('}');
     this.lambdas.push(lines.join('\n'));
 
-    return lambdaName;
+    return `nami_value_function((void*)${lambdaName})`;
   }
 
   // ── Helper Methods ─────────────────────────────────────

@@ -1,0 +1,140 @@
+// Robin Framework - Application Core
+// Wrapper around NAMI's http module with Express-like API
+
+import http;
+
+// Create Robin application
+export function app() {
+  const server = http.create();
+  const middlewares = [];
+  const routes = {
+    GET: {},
+    POST: {},
+    PUT: {},
+    DELETE: {},
+    PATCH: {}
+  };
+  
+  // Middleware system
+  function use(middleware) {
+    if (typeof middleware === "function") {
+      middlewares.push(middleware);
+    }
+    return server;
+  }
+  
+  // Route registration
+  function get(path, handler) {
+    routes.GET[path] = handler;
+    server.get(path, createHandler(handler, middlewares));
+    return server;
+  }
+  
+  function post(path, handler) {
+    routes.POST[path] = handler;
+    server.post(path, createHandler(handler, middlewares));
+    return server;
+  }
+  
+  function put(path, handler) {
+    routes.PUT[path] = handler;
+    server.put(path, createHandler(handler, middlewares));
+    return server;
+  }
+  
+  function deleteRoute(path, handler) {
+    routes.DELETE[path] = handler;
+    server.delete(path, createHandler(handler, middlewares));
+    return server;
+  }
+  
+  function patch(path, handler) {
+    routes.PATCH[path] = handler;
+    // PATCH uses PUT internally for now
+    server.put(path, createHandler(handler, middlewares));
+    return server;
+  }
+  
+  // Create handler with middleware chain
+  function createHandler(handler, middlewares) {
+    return (req, res) => {
+      let index = 0;
+      
+      function next() {
+        if (index < middlewares.length) {
+          const middleware = middlewares[index];
+          index = index + 1;
+          middleware(req, res, next);
+        } else {
+          handler(req, res);
+        }
+      }
+      
+      next();
+    };
+  }
+  
+  // Listen
+  function listen(port, callback) {
+    server.listen(port, callback);
+  }
+  
+  // Return app object
+  return {
+    use: use,
+    get: get,
+    post: post,
+    put: put,
+    delete: deleteRoute,
+    patch: patch,
+    listen: listen,
+    _server: server,
+    _routes: routes,
+    _middlewares: middlewares
+  };
+}
+
+// Router for modular routing
+export function Router() {
+  const routes = {
+    GET: {},
+    POST: {},
+    PUT: {},
+    DELETE: {},
+    PATCH: {}
+  };
+  
+  function get(path, handler) {
+    routes.GET[path] = handler;
+    return this;
+  }
+  
+  function post(path, handler) {
+    routes.POST[path] = handler;
+    return this;
+  }
+  
+  function put(path, handler) {
+    routes.PUT[path] = handler;
+    return this;
+  }
+  
+  function deleteRoute(path, handler) {
+    routes.DELETE[path] = handler;
+    return this;
+  }
+  
+  function patch(path, handler) {
+    routes.PATCH[path] = handler;
+    return this;
+  }
+  
+  return {
+    get: get,
+    post: post,
+    put: put,
+    delete: deleteRoute,
+    patch: patch,
+    _routes: routes
+  };
+}

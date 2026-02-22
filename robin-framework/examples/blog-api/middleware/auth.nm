@@ -1,0 +1,75 @@
+// Authentication middleware
+import { db } from "../config/database.nm";
+
+// Simple token-based auth (in production, use JWT)
+export function authenticate(req, res, next) {
+  const token = req.headers["authorization"];
+  
+  if (!token) {
+    res.status(401).json({
+      error: "Unauthorized",
+      message: "No token provided"
+    });
+    return;
+  }
+  
+  // Find session
+  let session = null;
+  for (let i = 0; i < db.sessions.length; i = i + 1) {
+    if (db.sessions[i].token === token) {
+      session = db.sessions[i];
+      break;
+    }
+  }
+  
+  if (!session) {
+    res.status(401).json({
+      error: "Unauthorized",
+      message: "Invalid token"
+    });
+    return;
+  }
+  
+  // Find user
+  let user = null;
+  for (let i = 0; i < db.users.length; i = i + 1) {
+    if (db.users[i].id === session.userId) {
+      user = db.users[i];
+      break;
+    }
+  }
+  
+  if (!user) {
+    res.status(401).json({
+      error: "Unauthorized",
+      message: "User not found"
+    });
+    return;
+  }
+  
+  // Attach user to request
+  req.user = user;
+  
+  next();
+}
+
+// Admin only middleware
+export function requireAdmin(req, res, next) {
+  if (!req.user) {
+    res.status(401).json({
+      error: "Unauthorized",
+      message: "Authentication required"
+    });
+    return;
+  }
+  
+  if (req.user.role !== "admin") {
+    res.status(403).json({
+      error: "Forbidden",
+      message: "Admin access required"
+    });
+    return;
+  }
+  
+  next();
+}

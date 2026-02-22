@@ -1,0 +1,35 @@
+{
+  "name": "robin",
+  "version": "1.0.0",
+  "description": "Enterprise-grade API framework for NAMI language",
+  "main": "index.nm",
+  "type": "module",
+  "keywords": [
+    "nami",
+    "framework",
+    "api",
+    "rest",
+    "http",
+    "server",
+    "express",
+    "web"
+  ],
+  "author": "NAMI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Araryarch/NAMI"
+  },
+  "exports": {
+    ".": "./index.nm",
+    "./db": "./db/index.nm",
+    "./auth": "./auth/index.nm",
+    "./validation": "./validation/index.nm"
+  },
+  "dependencies": {
+    "nmorm": "^1.0.0"
+  },
+  "peerDependencies": {
+    "nami": ">=0.1.0"
+  }
+}

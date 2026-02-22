@@ -94,6 +94,8 @@ export class SymbolTable {
       ['Math', Types.object()],
       ['console', Types.object()],
       ['JSON', Types.object()],
+      ['http', Types.object()], // HTTP module
+      ['nm', Types.object()], // NM module
     ];
 
     for (const [name, type] of builtins) {

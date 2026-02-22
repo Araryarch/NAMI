@@ -1,0 +1,8 @@
+// NMORM - Main Entry Point
+// Export ORM public API
+
+export { ORM } from "./core/orm.nm";
+export { Model } from "./core/model.nm";
+export { QueryBuilder } from "./core/query-builder.nm";
+export { Migration } from "./core/migration.nm";
+export { Seeder } from "./core/seeder.nm";

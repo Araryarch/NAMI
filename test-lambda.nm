@@ -1,0 +1,11 @@
+import http;
+
+const server = http.create();
+
+server.get("/", (req, res) => {
+    res.json({ message: "Hello from NAMI lambda!" });
+});
+
+server.listen(3000, () => {
+    println("Server is running on port 3000");
+});

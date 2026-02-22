@@ -197,5 +197,44 @@ export class ModuleCompiler {
     if (fs.existsSync(runtimeHeaderSrc)) {
       fs.copyFileSync(runtimeHeaderSrc, runtimeHeaderDest);
     }
+
+    // Copy HTTP stub header
+    const httpStubSrc = path.join(__dirname, '../../runtime/nami_http_stub.h');
+    const httpStubDest = path.join(outputDir, 'nami_http_stub.h');
+
+    if (fs.existsSync(httpStubSrc)) {
+      fs.copyFileSync(httpStubSrc, httpStubDest);
+    }
+
+    // Copy HTTP simple header
+    const httpSimpleSrc = path.join(__dirname, '../../runtime/nami_http_simple.h');
+    const httpSimpleDest = path.join(outputDir, 'nami_http_simple.h');
+
+    if (fs.existsSync(httpSimpleSrc)) {
+      fs.copyFileSync(httpSimpleSrc, httpSimpleDest);
+    }
+
+    // Copy HTTP mongoose header
+    const httpMongooseSrc = path.join(__dirname, '../../runtime/nami_http_mongoose.h');
+    const httpMongooseDest = path.join(outputDir, 'nami_http_mongoose.h');
+
+    if (fs.existsSync(httpMongooseSrc)) {
+      fs.copyFileSync(httpMongooseSrc, httpMongooseDest);
+    }
+
+    // Copy mongoose files if they exist
+    const mongooseHSrc = path.join(__dirname, '../../runtime/mongoose.h');
+    const mongooseHDest = path.join(outputDir, 'mongoose.h');
+
+    if (fs.existsSync(mongooseHSrc)) {
+      fs.copyFileSync(mongooseHSrc, mongooseHDest);
+    }
+
+    const mongooseCSrc = path.join(__dirname, '../../runtime/mongoose.c');
+    const mongooseCDest = path.join(outputDir, 'mongoose.c');
+
+    if (fs.existsSync(mongooseCSrc)) {
+      fs.copyFileSync(mongooseCSrc, mongooseCDest);
+    }
   }
 }

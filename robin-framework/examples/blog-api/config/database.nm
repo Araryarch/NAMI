@@ -1,0 +1,66 @@
+// Database configuration
+export const db = {
+  users: [],
+  posts: [],
+  comments: [],
+  sessions: []
+};
+
+// Initialize with sample data
+export function initDatabase() {
+  // Sample users
+  db.users.push({
+    id: 1,
+    username: "admin",
+    email: "admin@example.com",
+    password: "admin123", // In production, use bcrypt
+    role: "admin",
+    createdAt: "2024-01-01T00:00:00Z"
+  });
+  
+  db.users.push({
+    id: 2,
+    username: "john",
+    email: "john@example.com",
+    password: "john123",
+    role: "user",
+    createdAt: "2024-01-02T00:00:00Z"
+  });
+  
+  // Sample posts
+  db.posts.push({
+    id: 1,
+    title: "Welcome to Blog API",
+    content: "This is the first post",
+    authorId: 1,
+    published: true,
+    createdAt: "2024-01-01T10:00:00Z"
+  });
+  
+  db.posts.push({
+    id: 2,
+    title: "Getting Started with NAMI",
+    content: "NAMI is a powerful language",
+    authorId: 1,
+    published: true,
+    createdAt: "2024-01-02T10:00:00Z"
+  });
+  
+  println("Database initialized with sample data");
+}
+
+// Get next ID for a collection
+export function getNextId(collection) {
+  if (collection.length === 0) {
+    return 1;
+  }
+  
+  let maxId = 0;
+  for (let i = 0; i < collection.length; i = i + 1) {
+    if (collection[i].id > maxId) {
+      maxId = collection[i].id;
+    }
+  }
+  
+  return maxId + 1;
+}

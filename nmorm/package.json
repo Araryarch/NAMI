@@ -1,0 +1,26 @@
+{
+  "name": "nmorm",
+  "version": "1.0.0",
+  "description": "Modern Object-Relational Mapping library for NAMI language",
+  "main": "index.nm",
+  "type": "module",
+  "keywords": [
+    "nami",
+    "orm",
+    "database",
+    "sql",
+    "sqlite",
+    "postgresql",
+    "mysql",
+    "query-builder"
+  ],
+  "author": "NAMI Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Araryarch/NAMI"
+  },
+  "peerDependencies": {
+    "nami": ">=0.1.0"
+  }
+}
