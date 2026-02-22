@@ -9,7 +9,7 @@ Alice
 {"city":"New York","zip":10001}
 New York
 {"name":"David","scores":[85,90,95]}
-85 90 95
+[85,90,95]
 90
 30
 {"x":10,"y":20}

@@ -1,0 +1,13 @@
+=== Modern Output (println) ===
+[1,2,3,4,5]
+{"name":"Alice","age":30}
+Hello, World!
+
+=== Low-level Output (printfln) ===
+1 2 3 4 5
+name:Alice age:30
+Hello, World!
+
+=== Mixed Array ===
+[1,"hello",true,[10,20]]
+1 hello true 10 20

@@ -856,7 +856,7 @@ static inline nami_value_t nami_shr(nami_value_t a, nami_value_t b) {
  * Supports all NAMI data types
 /**
  * Print a value for nested contexts (inside arrays/objects)
- * Strings are printed WITHOUT quotes
+ * Strings are printed WITH quotes for proper JSON format
  */
 static inline void nami_print_value_nested(nami_value_t v) {
     switch (v.type) {
@@ -867,7 +867,7 @@ static inline void nami_print_value_nested(nami_value_t v) {
             printf("%g", v.value.as_float); 
             break;
         case NAMI_TYPE_STRING: 
-            printf("%s", v.value.as_string->data); 
+            printf("\"%s\"", v.value.as_string->data); 
             break;
         case NAMI_TYPE_BOOL: 
             printf("%s", v.value.as_bool ? "true" : "false"); 
@@ -890,7 +890,7 @@ static inline void nami_print_value_nested(nami_value_t v) {
             printf("{");
             for (int64_t i = 0; i < obj->count; i++) {
                 if (i > 0) printf(",");
-                printf("%s:", obj->entries[i].key);
+                printf("\"%s\":", obj->entries[i].key);
                 nami_print_value_nested(obj->entries[i].value);
             }
             printf("}");
@@ -939,7 +939,7 @@ static inline void nami_print_value(nami_value_t v) {
             printf("{");
             for (int64_t i = 0; i < obj->count; i++) {
                 if (i > 0) printf(",");
-                printf("%s:", obj->entries[i].key);
+                printf("\"%s\":", obj->entries[i].key);
                 nami_print_value_nested(obj->entries[i].value);
             }
             printf("}");

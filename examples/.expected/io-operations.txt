@@ -2,7 +2,7 @@ Hello, World!
 42
 true
 null
-1 2 3
+[1,2,3]
 {"name":"Alice","age":30}
 15
 30
