@@ -105,6 +105,7 @@ export class DeadCodeEliminator {
       case 'ForInStatement':
       case 'ForOfStatement':
       case 'LoopStatement': {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
         const optimizedBody = this.optimizeStatement((stmt as any).body);
         return {
           ...stmt,
@@ -221,7 +222,7 @@ export class DeadCodeEliminator {
         }
         return null;
 
-      case 'LogicalExpression':
+      case 'LogicalExpression': {
         const left = this.evaluateConstantBoolean(expr.left);
         const right = this.evaluateConstantBoolean(expr.right);
 
@@ -233,6 +234,7 @@ export class DeadCodeEliminator {
           if (left === false && right !== null) return right;
         }
         return null;
+      }
 
       default:
         return null;

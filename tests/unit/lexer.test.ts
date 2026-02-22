@@ -229,6 +229,7 @@ describe('Lexer', () => {
       const tokens = lexer.tokenize();
 
       expect(tokens[0].type).toBe(TokenType.STRING);
+      // eslint-disable-next-line no-useless-escape
       expect(tokens[0].literal).toBe('\n\t\r\\\'\"\"\0\b\f\v');
     });
 

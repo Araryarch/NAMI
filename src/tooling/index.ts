@@ -22,6 +22,10 @@ export type {
 
 export { DEFAULT_CONFIG, loadConfig, validateConfig } from './shared/config';
 
+// Import for internal use
+import type { ToolingConfig } from './shared/config';
+import { loadConfig, validateConfig } from './shared/config';
+
 // Core services (will be implemented in subsequent tasks)
 export * from './token-provider';
 export * from './diagnostic';
@@ -39,15 +43,16 @@ export const TOOLING_VERSION = '0.1.0';
 /**
  * Initialize the tooling system with configuration
  */
-export function initializeTooling(workspaceRoot?: string) {
+export function initializeTooling(workspaceRoot?: string): ToolingConfig {
   // This will be implemented as components are added
   console.log(`Initializing Nami Developer Tooling v${TOOLING_VERSION}`);
 
-  // Load configuration
-  const config = require('./shared/config').loadConfig(workspaceRoot);
+  // Load and validate configuration
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const config: ToolingConfig = loadConfig(workspaceRoot);
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+  const errors: string[] = validateConfig(config);
 
-  // Validate configuration
-  const errors = require('./shared/config').validateConfig(config);
   if (errors.length > 0) {
     throw new Error(`Configuration validation failed: ${errors.join(', ')}`);
   }

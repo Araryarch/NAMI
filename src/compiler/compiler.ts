@@ -3,7 +3,7 @@
  * Lexer → Parser → Semantic Analyzer → Code Generator
  */
 
-import { Lexer } from '../lexer';
+import { Lexer, TokenType } from '../lexer';
 import { Parser, Program } from '../parser';
 import { SemanticAnalyzer, SymbolTable } from '../analyzer';
 import { CodeGenerator, GeneratedCode } from '../codegen';
@@ -68,7 +68,7 @@ export class Compiler {
     // Step 2: Parsing
     const parser = new Parser(
       undefined,
-      tokens.filter((t) => t.type !== 'COMMENT' && t.type !== 'BLOCK_COMMENT')
+      tokens.filter((t) => t.type !== TokenType.COMMENT && t.type !== TokenType.BLOCK_COMMENT)
     );
     const ast = parser.parse();
     const parseErrors = parser.getErrors();
@@ -135,7 +135,7 @@ export class Compiler {
 
     const parser = new Parser(
       undefined,
-      tokens.filter((t) => t.type !== 'COMMENT' && t.type !== 'BLOCK_COMMENT')
+      tokens.filter((t) => t.type !== TokenType.COMMENT && t.type !== TokenType.BLOCK_COMMENT)
     );
     const ast = parser.parse();
 

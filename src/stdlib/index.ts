@@ -4,6 +4,8 @@
  * Requirements: 9.1-9.7, 10.1-10.6, 11.1-11.6
  */
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 // ── Sorting Algorithms ─────────────────────────────────
 
 export interface SortResult {

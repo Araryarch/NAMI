@@ -1038,6 +1038,7 @@ export class Parser {
   private parseCallExpression(): Expression {
     let expr = this.parsePrimary();
 
+    // eslint-disable-next-line no-constant-condition
     while (true) {
       if (this.check(TokenType.LEFT_PAREN)) {
         this.advance();

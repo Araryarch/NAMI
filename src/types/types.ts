@@ -68,7 +68,7 @@ export const Types = {
   }),
   object: (fields?: Map<string, NamiType>): ObjectType => ({
     kind: 'object',
-    fields: fields || new Map(),
+    fields: fields || new Map<string, NamiType>(),
   }),
   pointer: (pointeeType: NamiType, nullable = true): PointerType => ({
     kind: 'pointer',

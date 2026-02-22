@@ -8,11 +8,13 @@
  * 3. Package modules: `import { fetch } from "nami-fetch"` (future)
  */
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import * as path from 'path';
 import * as fs from 'fs';
 import { Program } from '../parser/ast';
 import { Parser } from '../parser';
-import { Lexer } from '../lexer';
+import { Lexer, TokenType } from '../lexer';
 
 /** Types of modules in NAMI */
 export type ModuleType = 'builtin' | 'file' | 'package';
@@ -183,7 +185,8 @@ export function buildDependencyGraph(
     try {
       source = fs.readFileSync(absolutePath, 'utf-8');
     } catch (error) {
-      throw new ModuleResolutionError(`Failed to read module: ${error}`, absolutePath);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      throw new ModuleResolutionError(`Failed to read module: ${errorMessage}`, absolutePath);
     }
 
     // Parse the module
@@ -191,7 +194,7 @@ export function buildDependencyGraph(
     const tokens = lexer.tokenize();
     const parser = new Parser(
       undefined,
-      tokens.filter((t) => t.type !== 'COMMENT' && t.type !== 'BLOCK_COMMENT')
+      tokens.filter((t) => t.type !== TokenType.COMMENT && t.type !== TokenType.BLOCK_COMMENT)
     );
     const ast = parser.parse();
 

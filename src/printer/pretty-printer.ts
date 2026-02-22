@@ -3,6 +3,8 @@
  * Used for parser round-trip testing and code formatting
  */
 
+/* eslint-disable no-case-declarations */
+
 import { Program, Statement, Expression, Parameter } from '../parser/ast';
 
 export class PrettyPrinter {
@@ -267,12 +269,13 @@ export class PrettyPrinter {
         return `new ${callee}(${args})`;
       }
 
-      case 'MemberExpression':
+      case 'MemberExpression': {
         if (expr.computed) {
           return `${this.printExpression(expr.object)}[${this.printExpression(expr.property)}]`;
         }
         const op = expr.optional ? '?.' : '.';
         return `${this.printExpression(expr.object)}${op}${this.printExpression(expr.property)}`;
+      }
 
       case 'ArrayExpression': {
         const elements = expr.elements.map((e) => (e ? this.printExpression(e) : '')).join(', ');

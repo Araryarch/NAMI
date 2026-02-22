@@ -4,6 +4,8 @@
  * Requirements: 17.3
  */
 
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import {
   Program,
   Statement,
